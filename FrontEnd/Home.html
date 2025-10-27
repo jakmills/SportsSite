@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Millie's Sports</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class = "navbar">
+        <a href="home.html">Home</a>
+        <a href="YourTeam.html">Your Team</a>
+        <a href="News.html">News</a>
+        <a href="Profile.html">Profile</a>
+    </div>
+    <!-- Live games section: hidden by default and shown only when backend reports ongoing games -->
+    <section id="live-games" class="live-games" aria-hidden="true" style="display:none;">
+        <h2>Live games</h2>
+        <div id="live-games-list" class="live-games-list">
+            <!-- JS will populate live games here when /api/games/ongoing returns ongoing=true -->
+        </div>
+    </section>
+
+    <!-- Make the section for league games -->
+    <!-- Section for day of the week and ability to switch days to see different games -->
+    <div>
+        <h2>League</h2>
+        <P>Team 1</P>
+        <P>Team 2</P>
+        <P>Score 1</P>
+        <p>Score 2</P>
+        <p>Time</p>
+        <!-- Repeat for more games on given day-->
+    </div>
+    
+    <script>
+    // Frontend contract: GET /api/games/ongoing -> { ongoing: boolean, games: [ {home:'', away:'', scoreHome:'', scoreAway:'', time:'', link:''}, ... ] }
+    document.addEventListener('DOMContentLoaded', function () {
+        const liveSection = document.getElementById('live-games');
+        const list = document.getElementById('live-games-list');
+
+        // Small helper to safely hide the section
+        function hideLive() {
+            liveSection.style.display = 'none';
+            liveSection.setAttribute('aria-hidden', 'true');
+        }
+
+        // Helper to show and set aria
+        function showLive() {
+            liveSection.style.display = 'block';
+            liveSection.setAttribute('aria-hidden', 'false');
+        }
+
+        // Default hidden
+        hideLive();
+
+        // Call backend to determine if any games are ongoing
+        fetch('/api/games/ongoing', { cache: 'no-store' })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // Expecting { ongoing: boolean, games: [] }
+                if (data && data.ongoing && Array.isArray(data.games) && data.games.length > 0) {
+                    // Populate list
+                    list.innerHTML = ''; // clear
+                    data.games.forEach(game => {
+                        const item = document.createElement('div');
+                        item.className = 'live-game-item';
+
+                        const teams = document.createElement('div');
+                        teams.className = 'live-game-teams';
+                        teams.textContent = `${game.home} vs ${game.away}`;
+
+                        const score = document.createElement('div');
+                        score.className = 'live-game-score';
+                        if (game.scoreHome != null && game.scoreAway != null) {
+                            score.textContent = `${game.scoreHome} - ${game.scoreAway}`;
+                        } else {
+                            score.textContent = game.time || 'In progress';
+                        }
+
+                        item.appendChild(teams);
+                        item.appendChild(score);
+
+                        if (game.link) {
+                            const a = document.createElement('a');
+                            a.href = game.link;
+                            a.textContent = 'Details';
+                            a.className = 'live-game-link';
+                            a.setAttribute('aria-label', `Details for ${game.home} vs ${game.away}`);
+                            item.appendChild(a);
+                        }
+
+                        list.appendChild(item);
+                    });
+
+                    showLive();
+                } else {
+                    // No ongoing games -> keep hidden
+                    hideLive();
+                }
+            })
+            .catch(err => {
+                // On error, keep section hidden. Optionally log for debugging.
+                console.warn('Failed to fetch live games:', err);
+                hideLive();
+            });
+    });
+    </script>
+</body>
+</html>
