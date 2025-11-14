@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class = "navbar">
-        <a href="home.html">Home</a>
+        <a href="Home.html">Home</a>
         <a href="YourTeam.html">Your Team</a>
         <a href="News.html">News</a>
         <a href="Profile.html">Profile</a>
@@ -23,14 +23,66 @@
 
     <!-- Make the section for league games -->
     <!-- Section for day of the week and ability to switch days to see different games -->
-    <div>
-        <h2>League</h2>
-        <P>Team 1</P>
-        <P>Team 2</P>
-        <P>Score 1</P>
-        <p>Score 2</P>
-        <p>Time</p>
-        <!-- Repeat for more games on given day-->
+    <div class="leagues-container">
+        <section class="league-card">
+            <h2>Premier League</h2>
+            <div class="matches">
+                <div class="match">
+                    <span class="team">Arsenal</span>
+                    <span class="vs">vs</span>
+                    <span class="team">Chelsea</span>
+                    <span class="score">2-1</span>
+                    <span class="time">67'</span>
+                </div>
+                <div class="match">
+                    <span class="team">Manchester United</span>
+                    <span class="vs">vs</span>
+                    <span class="team">Liverpool</span>
+                    <span class="score">-</span>
+                    <span class="time">5:30 PM</span>
+                </div>
+            </div>
+        </section>
+        
+        <section class="league-card">
+            <h2>La Liga</h2>
+            <div class="matches">
+                <div class="match">
+                    <span class="team">Barcelona</span>
+                    <span class="vs">vs</span>
+                    <span class="team">Real Madrid</span>
+                    <span class="score">1-0</span>
+                    <span class="time">45'</span>
+                </div>
+                <div class="match">
+                    <span class="team">Atletico Madrid</span>
+                    <span class="vs">vs</span>
+                    <span class="team">Sevilla</span>
+                    <span class="score">-</span>
+                    <span class="time">6:00 PM</span>
+                </div>
+            </div>
+        </section>
+        
+        <section class="league-card">
+            <h2>Serie A</h2>
+            <div class="matches">
+                <div class="match">
+                    <span class="team">Juventus</span>
+                    <span class="vs">vs</span>
+                    <span class="team">Inter Milan</span>
+                    <span class="score">0-0</span>
+                    <span class="time">30'</span>
+                </div>
+                <div class="match">
+                    <span class="team">AC Milan</span>
+                    <span class="vs">vs</span>
+                    <span class="team">Napoli</span>
+                    <span class="score">-</span>
+                    <span class="time">7:00 PM</span>
+                </div>
+            </div>
+        </section>
     </div>
     
 </body>

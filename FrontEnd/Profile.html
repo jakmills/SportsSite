@@ -13,16 +13,27 @@
         <a href="News.html">News</a>
         <a href="Profile.html">Profile</a>
     </div>
+
+    <!--Make sure user is logged in, if not, prompt to login or register-->
+    <div class ="profile-prompt">
+        <h2>Welcome</h2>
+        <p>Please log in or register to view and edit your profile details.</p>
+        <button onclick="location.href='login.html'">Log In</button>
+        <button onclick="location.href='register.html'">Register</button>
+    </div>
+
+
     <!-- Profile content goes here -->
      <div>
         <h2>User Profile</h2>
         <P>Username: [Username]</P>
         <p>Email: [Email]</p>
         <p>Member Since: [Date]</p>
-        <!-- Additional profile details can be added here -->
      </div>
-     <div>
-        need to make it possible to edit profile details and to make it so if you are not logged in, it prompts you to make an account
-     </div>
+
+
+    <!-- Additional profile details or editing options can be added here -->
+
+    
 </body>
 </html>
