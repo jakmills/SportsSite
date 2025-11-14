@@ -5,17 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase App (core) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJuUtvyyzUgl9uafIf-O86bSs3LHMhHhc",
+            authDomain: "jashsports.firebaseapp.com",
+            projectId: "jashsports",
+            storageBucket: "jashsports.firebasestorage.app",
+            messagingSenderId: "92796247948",
+            appId: "1:92796247948:web:997254dd6a3382efa3c0a9",
+            measurementId: "G-50TF15H427"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Set to window
+        window.auth = auth;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    </script>
 </head>
 <body>
     <div class="register">
         <h2>Register</h2>
-        <form action="/submit_registration" method="POST">
+        <form id="register-form">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required><br><br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br><br>
             <button type="submit">Register</button>
         </form>
+        <p id="error-message" style="color: red;"></p>
     </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await window.createUserWithEmailAndPassword(window.auth, email, password);
+                alert('Registration successful!');
+                window.location.href = 'Profile.html';
+            } catch (error) {
+                document.getElementById('error-message').textContent = error.message;
+            }
+        });
+    </script>
 </body>
 </html>
