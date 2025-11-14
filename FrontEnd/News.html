@@ -5,14 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Latest News</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase for auth check -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJuUtvyyzUgl9uafIf-O86bSs3LHMhHhc",
+            authDomain: "jashsports.firebaseapp.com",
+            projectId: "jashsports",
+            storageBucket: "jashsports.firebasestorage.app",
+            messagingSenderId: "92796247948",
+            appId: "1:92796247948:web:997254dd6a3382efa3c0a9",
+            measurementId: "G-50TF15H427"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.auth = auth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+
+        // Auth state listener
+        onAuthStateChanged(auth, (user) => {
+            const logoutLink = document.getElementById('logout-link');
+            if (user) {
+                logoutLink.style.display = 'inline';
+            } else {
+                logoutLink.style.display = 'none';
+            }
+        });
+
+        // Logout function
+        window.logout = async () => {
+            await signOut(auth);
+            window.location.href = 'Home.html';
+        };
+    </script>
 </head>
 <body>
     <div class = "navbar">
-        <a href="Home.html">Home</a>
+        <a href="index.html">Home</a>
         <a href="YourTeam.html">Your Team</a>
         <a href="News.html">News</a>
         <a href="Profile.html">Profile</a>
+        <a href="#" id="logout-link" style="float:right; color:white; margin-right:16px; display:none;" onclick="window.logout()">Logout</a>
     </div>
+
+
 
     <!-- News content goes here -->
     <main class="news-section">
