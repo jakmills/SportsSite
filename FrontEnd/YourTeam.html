@@ -15,13 +15,77 @@
     </div>
     <!-- List of favorite teams and when their next fixture is -->
     <main>
-        <section id="favorites" class="favorites">
-            <h2>Your Teams</h2>
-            <div id="favorites-empty" class="favorites-empty" style="display:none;">
-                <p>You haven't favorited any teams yet. Go to a team's page and click the ♥ to add them here.</p>
-            </div>
-            <div id="favorites-list" class="favorites-list">
-                <!-- JS will populate favorite team cards here -->
+        <section class="your-team-section">
+            <h1>Your Favorite Teams</h1>
+            <div class="teams-container">
+                <!-- Team 1: Arsenal -->
+                <div class="team-match-card">
+                    <div class="team-info">
+                        <div class="team-logo-placeholder">[A]</div>
+                        <div class="team-details">
+                            <h3>Arsenal</h3>
+                            <p>Premier League</p>
+                        </div>
+                    </div>
+                    <div class="next-match">
+                        <h4>Next Match</h4>
+                        <div class="match-teams">
+                            <span class="home-team">Arsenal</span>
+                            <span class="vs">vs</span>
+                            <span class="away-team">Chelsea</span>
+                        </div>
+                        <div class="match-details">
+                            <span>Dec 1, 2025 - 15:00</span>
+                            <span>Emirates Stadium</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team 2: Barcelona -->
+                <div class="team-match-card">
+                    <div class="team-info">
+                        <div class="team-logo-placeholder">[B]</div>
+                        <div class="team-details">
+                            <h3>Barcelona</h3>
+                            <p>La Liga</p>
+                        </div>
+                    </div>
+                    <div class="next-match">
+                        <h4>Next Match</h4>
+                        <div class="match-teams">
+                            <span class="home-team">Barcelona</span>
+                            <span class="vs">vs</span>
+                            <span class="away-team">Real Madrid</span>
+                        </div>
+                        <div class="match-details">
+                            <span>Dec 3, 2025 - 20:00</span>
+                            <span>Camp Nou</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team 3: Juventus -->
+                <div class="team-match-card">
+                    <div class="team-info">
+                        <div class="team-logo-placeholder">[J]</div>
+                        <div class="team-details">
+                            <h3>Juventus</h3>
+                            <p>Serie A</p>
+                        </div>
+                    </div>
+                    <div class="next-match">
+                        <h4>Next Match</h4>
+                        <div class="match-teams">
+                            <span class="home-team">Juventus</span>
+                            <span class="vs">vs</span>
+                            <span class="away-team">Inter Milan</span>
+                        </div>
+                        <div class="match-details">
+                            <span>Dec 5, 2025 - 18:00</span>
+                            <span>Allianz Stadium</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
