@@ -13,6 +13,10 @@ public class NewsAPI {
     public NewsAPI() {}
     
     private String getApikey(){
+        String apiKey = System.getenv("NEWS_API_KEY");
+        if (apiKey != null) {
+            return apiKey;
+        }
         Dotenv dotnev = Dotenv.load();
         return dotnev.get("NEWS_API_KEY");
     }

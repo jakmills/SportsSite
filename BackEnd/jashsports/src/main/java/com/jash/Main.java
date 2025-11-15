@@ -11,14 +11,17 @@ public class Main {
 
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
-                cors.addRule(rule -> {
-                    rule.allowHost("http://localhost:5500");
-                });
+                cors.addRule(rule -> rule.anyHost());
             });
-        }).start(7000);
+        });
+
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "7000"));
+        app.start(port);
 
 
         NewsAPI newsAPI = new NewsAPI();
+        app.get("/", ctx -> ctx.result("SportsSite API is running!"));
+
         app.get("/news/{league}", ctx -> {
             String league = ctx.pathParam("league").replace("-", " ");
             try {
