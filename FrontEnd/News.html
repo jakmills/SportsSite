@@ -116,6 +116,75 @@
                 </article>
             </div>
         </section>
+
+        <section class="news-category">
+            <h2>Ligue 1</h2>
+            <div class="news-articles">
+                <article class="news-card">
+                    <div class="news-image-placeholder">[Image]</div>
+                    <div class="news-content">
+                        <h3>PSG Dominates Ligue 1</h3>
+                        <p>Paris Saint-Germain continues to lead the Ligue 1 standings with a series of impressive victories.</p>
+                        <span class="news-date">November 5, 2025</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="news-category">
+            <h2>Bundesliga</h2>
+            <div class="news-articles">
+                <article class="news-card">
+                    <div class="news-image-placeholder">[Image]</div>
+                    <div class="news-content">
+                        <h3>Bayern Munich's Unbeaten Run</h3>
+                        <p>Bayern Munich remains unbeaten in the Bundesliga, showcasing their dominance in German football.</p>
+                        <span class="news-date">November 4, 2025</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <script>
+        function loadNews(league, containerSelector) {
+            fetch(`http://localhost:7000/news/${league}`)
+            .then(res => res.json())
+            .then(articles => {
+                const container = document.querySelector(containerSelector);
+                container.innerHTML = ''; // Clear existing temp articles
+
+                articles.forEach(article => {
+                    const articleDiv = document.createElement('article');
+                    articleDiv.className = 'news-card';
+                    
+                    articleDiv.innerHTML = `
+                        <div class="news-image-placeholder">
+                            ${article.image ? `<img src="${article.image}" alt="News Image" style="width:100%; height:100%; object-fit:cover;">` : '[Image]'}
+                        </div>
+                        <div class="news-content">
+                            <h3>${article.title.length > 50 ? article.title.substring(0,50) + '...' : article.title}</h3>
+                            <p>${article.caption}</p>
+                            <span class="news-date">${new Date(article.datePosted).toLocaleDateString()}</span>
+                        </div>
+                    `;
+                    
+                    container.appendChild(articleDiv);
+                });
+            })
+            .catch(error => {
+                console.error(`Error fetching ${league} news:`, error);
+                const container = document.querySelector(containerSelector);
+                container.innerHTML = '<p>Failed to load news.</p>';
+            });
+        }
+
+        // Load news for each league
+        loadNews('premier-league', 'section.news-category:nth-of-type(1) .news-articles');
+        loadNews('la-liga', 'section.news-category:nth-of-type(2) .news-articles');
+        loadNews('serie-a', 'section.news-category:nth-of-type(3) .news-articles');
+        loadNews('ligue-1', 'section.news-category:nth-of-type(4) .news-articles');
+        loadNews('bundesliga', 'section.news-category:nth-of-type(5) .news-articles');
+        </script>
     </main>
 </body>
 </html>
