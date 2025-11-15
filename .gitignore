@@ -1,2 +1,26 @@
 # Environment Variables
 .env
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Maven
+target/
+
+# Compiled class files
+*.class
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Log files
+*.log

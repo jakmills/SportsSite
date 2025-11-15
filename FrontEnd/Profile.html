@@ -5,35 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase App (core) -->
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+            import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+                apiKey: "AIzaSyAJuUtvyyzUgl9uafIf-O86bSs3LHMhHhc",
+                authDomain: "jashsports.firebaseapp.com",
+                projectId: "jashsports",
+                storageBucket: "jashsports.firebasestorage.app",
+                messagingSenderId: "92796247948",
+                appId: "1:92796247948:web:997254dd6a3382efa3c0a9",
+                measurementId: "G-50TF15H427"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const auth = getAuth(app);
+
+            // Set to window
+            window.auth = auth;
+            window.onAuthStateChanged = onAuthStateChanged;
+            window.signOut = signOut;
+
+            // Auth state listener
+            onAuthStateChanged(auth, (user) => {
+                const logoutLink = document.getElementById('logout-link');
+                if (user) {
+                    logoutLink.style.display = 'inline';
+                    document.getElementById('login-prompt').style.display = 'none';
+                    document.getElementById('profile-content').style.display = 'block';
+                    // Populate user data
+                    document.getElementById('username-display').textContent = `Username: ${user.displayName || user.email.split('@')[0]}`;
+                } else {
+                    logoutLink.style.display = 'none';
+                    document.getElementById('login-prompt').style.display = 'block';
+                    document.getElementById('profile-content').style.display = 'none';
+                }
+            });
+
+            // Logout functions
+            window.logout = async () => {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            };
+    </script>
 </head>
 <body>
     <div class = "navbar">
-        <a href="home.html">Home</a>
+        <a href="index.html">Home</a>
         <a href="YourTeam.html">Your Team</a>
         <a href="News.html">News</a>
         <a href="Profile.html">Profile</a>
+        <a href="#" id="logout-link" style="float:right; color:white; margin-right:16px; display:none;" onclick="window.logout()">Logout</a>
     </div>
 
     <!--Make sure user is logged in, if not, prompt to login or register-->
-    <div class ="profile-prompt">
+    <div class ="profile-prompt" id="login-prompt">
         <h2>Welcome</h2>
         <p>Please log in or register to view and edit your profile details.</p>
         <button onclick="location.href='login.html'">Log In</button>
         <button onclick="location.href='register.html'">Register</button>
     </div>
 
-
-    <!-- Profile content goes here -->
-     <div>
-        <h2>User Profile</h2>
-        <P>Username: [Username]</P>
-        <p>Email: [Email]</p>
-        <p>Member Since: [Date]</p>
-     </div>
+    <!-- Profile content goes here (shown when logged in) -->
+    <main class="profile-section" id="profile-content" style="display: none;">
+        <h1>Your Profile</h1>
+        <p id="username-display">Username: Loading...</p>
+        <button onclick="window.logout()">Log Out</button>
+    </main>
 
 
-    <!-- Additional profile details or editing options can be added here -->
-
-    
 </body>
 </html>

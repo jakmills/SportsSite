@@ -55,6 +55,20 @@ body {
     background-color: #555;
 }
 
+#google-login-btn {
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#google-login-btn:hover {
+    background-color: #3367d6;
+}
+
 .login label {
     font-family: Georgia, serif;
 }
@@ -364,4 +378,38 @@ body {
     .news-articles {
         grid-template-columns: 1fr;
     }
+}
+
+/* Profile page styling */
+.profile-section {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.profile-section h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.profile-section p {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.profile-section button {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.profile-section button:hover {
+    background-color: #b71c1c;
 }
