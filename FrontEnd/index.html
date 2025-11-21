@@ -124,14 +124,10 @@
                     matches.forEach(match => {
                         const div = document.createElement("div");
                         div.innerHTML = `
-                            <p><strong>${match.homeTeam.name}</strong> vs <strong>${match.awayTeam.name}</strong></p>
-                            <p>Date: ${new Date(match.utcDate).toLocaleString()}</p>
-                            
-
                             <span class="team">${match.homeTeam.name}</span>
                             <span class="vs">vs</span>
-                            <span class="team">${match.awayTeam.name}</span>
-                            <span class="score">SCORE</span>
+                            <span class="team">${match.awayTeam.name}</span> <br>
+                            <span class="score">SCORE</span> <br>
                             <span class="time">${new Date(match.utcDate).toLocaleString()}</span>
                             <hr>
                         `;
