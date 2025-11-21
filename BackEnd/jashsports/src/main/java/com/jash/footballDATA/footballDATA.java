@@ -8,7 +8,6 @@ import com.squareup.okhttp.Response;
 import io.github.cdimascio.dotenv.Dotenv; 
 
 public class footballDATA {
-    public final int clID = 2001;
 
     public footballDATA() {   
     }
@@ -18,51 +17,35 @@ public class footballDATA {
         return dotnev.get("FOOTBALLDATA_API_KEY");
     }
 
-    public ArrayList<Match> getCLMatches() throws Exception {
-
+     public ArrayList<Match> getMatches(String league) throws Exception {
         String apiKey = getApikey();
         OkHttpClient client = new OkHttpClient();
-
         Request request = new Request.Builder()
-                .url("https://api.football-data.org/v4/competitions/" + clID + "/matches")
-                .addHeader("X-Auth-Token", apiKey)
-                .build();
-
+            .url("https://api.football-data.org/v4/competitions/" + getLeagueID(league) + "/matches?dateFrom=2025-11-15&dateTo=2025-11-25")
+            .addHeader("X-Auth-Token", apiKey)
+            .build();
         Response response = client.newCall(request).execute();
-
         if (!response.isSuccessful()) {
             throw new RuntimeException("API request failed: " + response.code());
         }
-
         String json = response.body().string();
-        Gson gson = new Gson();
-            // Parse the top-level object
+        Gson gson = new Gson();     // Parse the top-level object
         MatchesResponse data = gson.fromJson(json, MatchesResponse.class);
-
         return data.matches; // This is your ArrayList<Match>
+    }
+
+    public int getLeagueID(String league) {
+        switch (league.toLowerCase().replaceAll("\\s", "")){
+            case "championsleague":
+                return 2001;
+            case "premierleague":
+                return 2021;
+            case "laliga":
+                return 2014;
+            case "seriea":
+                return 2019;
+            default:
+                return -1;
         }
-
-        public ArrayList<Match> getPLMatches() throws Exception {
-
-        String apiKey = getApikey();
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("https://api.football-data.org/v4/competitions/" + 2021 + "/matches?dateFrom=2025-11-15&dateTo=2025-11-25")
-                .addHeader("X-Auth-Token", apiKey)
-                .build();
-
-        Response response = client.newCall(request).execute();
-
-        if (!response.isSuccessful()) {
-            throw new RuntimeException("API request failed: " + response.code());
-        }
-
-        String json = response.body().string();
-        Gson gson = new Gson();
-            // Parse the top-level object
-        MatchesResponse data = gson.fromJson(json, MatchesResponse.class);
-
-        return data.matches; // This is your ArrayList<Match>
-        }
+    }
 }

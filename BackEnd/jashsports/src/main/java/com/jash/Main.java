@@ -23,14 +23,16 @@ public class Main {
         app.start(port);
 
         footballDATA fd = new footballDATA();
-        app.get("/football/pl", ctx -> {
+        app.get("/football/{league}", ctx -> {
             try {
-                ArrayList<Match> matches = fd.getPLMatches();
+                String league = ctx.pathParam("league").replace("-", " ");
+                ArrayList<Match> matches = fd.getMatches(league);
                 ctx.json(matches);
             } catch (Exception e) {
                 ctx.status(500).result("Error fetching PL matches: " + e.getMessage());
             }
         });
+
 
 
         NewsAPI newsAPI = new NewsAPI();

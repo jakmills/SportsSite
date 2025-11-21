@@ -68,7 +68,7 @@
     <div class="leagues-container">
         <section class="league-card">
             <h2>Premier League</h2>
-            <div id="pl-matches">
+            <div class="matches">
 
             </div>
         </section>
@@ -114,11 +114,11 @@
         </section>
     </div>
     <script>
-        function loadPLMatches() {
-            fetch("http://localhost:7000/football/pl")
+        function loadMatches(league, containerSelector) {
+            fetch(`http://localhost:7000/football/${league}`)
                 .then(response => response.json())
                 .then(matches => {
-                    const container = document.getElementById("pl-matches");
+                    const container = document.querySelector(containerSelector);
                     container.innerHTML = "";
 
                     matches.forEach(match => {
@@ -126,6 +126,13 @@
                         div.innerHTML = `
                             <p><strong>${match.homeTeam.name}</strong> vs <strong>${match.awayTeam.name}</strong></p>
                             <p>Date: ${new Date(match.utcDate).toLocaleString()}</p>
+                            
+
+                            <span class="team">${match.homeTeam.name}</span>
+                            <span class="vs">vs</span>
+                            <span class="team">${match.awayTeam.name}</span>
+                            <span class="score">SCORE</span>
+                            <span class="time">${new Date(match.utcDate).toLocaleString()}</span>
                             <hr>
                         `;
                         container.appendChild(div);
@@ -134,7 +141,9 @@
                 .catch(err => console.error("Error loading matches:", err));
         }
         // Load immediately when page opens
-        loadPLMatches();
+        loadMatches('Premier-League', 'section.league-card:nth-of-type(1) .matches');
+        loadMatches('La-Liga', 'section.league-card:nth-of-type(2) .matches');
+        loadMatches('Serie-A', 'section.league-card:nth-of-type(3) .matches');
     </script>
 </body>
 </html>
