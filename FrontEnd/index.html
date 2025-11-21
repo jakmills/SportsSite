@@ -68,21 +68,8 @@
     <div class="leagues-container">
         <section class="league-card">
             <h2>Premier League</h2>
-            <div class="matches">
-                <div class="match">
-                    <span class="team">Arsenal</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Chelsea</span>
-                    <span class="score">2-1</span>
-                    <span class="time">67'</span>
-                </div>
-                <div class="match">
-                    <span class="team">Manchester United</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Liverpool</span>
-                    <span class="score">-</span>
-                    <span class="time">5:30 PM</span>
-                </div>
+            <div id="pl-matches">
+
             </div>
         </section>
         
@@ -126,6 +113,28 @@
             </div>
         </section>
     </div>
-    
+    <script>
+        function loadPLMatches() {
+            fetch("http://localhost:7000/football/pl")
+                .then(response => response.json())
+                .then(matches => {
+                    const container = document.getElementById("pl-matches");
+                    container.innerHTML = "";
+
+                    matches.forEach(match => {
+                        const div = document.createElement("div");
+                        div.innerHTML = `
+                            <p><strong>${match.homeTeam.name}</strong> vs <strong>${match.awayTeam.name}</strong></p>
+                            <p>Date: ${new Date(match.utcDate).toLocaleString()}</p>
+                            <hr>
+                        `;
+                        container.appendChild(div);
+                    });
+                })
+                .catch(err => console.error("Error loading matches:", err));
+        }
+        // Load immediately when page opens
+        loadPLMatches();
+    </script>
 </body>
 </html>

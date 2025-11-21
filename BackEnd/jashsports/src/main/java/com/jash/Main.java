@@ -1,5 +1,9 @@
 package com.jash;
 
+import java.util.ArrayList;
+
+import com.jash.footballDATA.Match;
+import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
 
 import io.javalin.Javalin;
@@ -17,6 +21,16 @@ public class Main {
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "7000"));
         app.start(port);
+
+        footballDATA fd = new footballDATA();
+        app.get("/football/pl", ctx -> {
+            try {
+                ArrayList<Match> matches = fd.getPLMatches();
+                ctx.json(matches);
+            } catch (Exception e) {
+                ctx.status(500).result("Error fetching PL matches: " + e.getMessage());
+            }
+        });
 
 
         NewsAPI newsAPI = new NewsAPI();
