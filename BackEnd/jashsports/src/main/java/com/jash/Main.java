@@ -29,10 +29,9 @@ public class Main {
                 ArrayList<Match> matches = fd.getMatches(league);
                 ctx.json(matches);
             } catch (Exception e) {
-                ctx.status(500).result("Error fetching PL matches: " + e.getMessage());
+                ctx.status(500).result("Error fetching matches: " + e.getMessage());
             }
         });
-
 
 
         NewsAPI newsAPI = new NewsAPI();
