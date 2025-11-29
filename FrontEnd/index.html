@@ -69,63 +69,62 @@
         <section class="league-card">
             <h2>Premier League</h2>
             <div class="matches">
-                <div class="match">
-                    <span class="team">Arsenal</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Chelsea</span>
-                    <span class="score">2-1</span>
-                    <span class="time">67'</span>
-                </div>
-                <div class="match">
-                    <span class="team">Manchester United</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Liverpool</span>
-                    <span class="score">-</span>
-                    <span class="time">5:30 PM</span>
-                </div>
             </div>
         </section>
         
         <section class="league-card">
             <h2>La Liga</h2>
             <div class="matches">
-                <div class="match">
-                    <span class="team">Barcelona</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Real Madrid</span>
-                    <span class="score">1-0</span>
-                    <span class="time">45'</span>
-                </div>
-                <div class="match">
-                    <span class="team">Atletico Madrid</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Sevilla</span>
-                    <span class="score">-</span>
-                    <span class="time">6:00 PM</span>
-                </div>
             </div>
         </section>
         
         <section class="league-card">
             <h2>Serie A</h2>
             <div class="matches">
-                <div class="match">
-                    <span class="team">Juventus</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Inter Milan</span>
-                    <span class="score">0-0</span>
-                    <span class="time">30'</span>
-                </div>
-                <div class="match">
-                    <span class="team">AC Milan</span>
-                    <span class="vs">vs</span>
-                    <span class="team">Napoli</span>
-                    <span class="score">-</span>
-                    <span class="time">7:00 PM</span>
-                </div>
+            </div>
+        </section>
+
+        <section class="league-card">
+            <h2>Ligue 1</h2>
+            <div class="matches">
+            </div>
+        </section>
+
+        <section class="league-card">
+            <h2>Bundesliga</h2>
+            <div class="matches">
             </div>
         </section>
     </div>
-    
+    <script>
+        function loadMatches(league, containerSelector) {
+            fetch(`http://localhost:7000/football/${league}`)
+                .then(response => response.json())
+                .then(matches => {
+                    const container = document.querySelector(containerSelector);
+                    container.innerHTML = "";
+
+                    matches.forEach(match => {
+                        const div = document.createElement("div");
+                        div.innerHTML =`
+                            <span class="team">${match.homeTeam.name}</span>
+                            <span class="vs">vs</span>
+                            <span class="team">${match.awayTeam.name}</span> <br>
+                            <span class="score">SCORE</span> <br>
+                            <span class="time">${new Date(match.utcDate).toLocaleString()}</span>
+                            <hr>
+                        `;
+                        container.appendChild(div);
+                    });
+                })
+                .catch(err => console.error("Error loading matches:", err));
+        }
+        // Load immediately when page opens
+        loadMatches('Premier-League', 'section.league-card:nth-of-type(1) .matches');
+        loadMatches('La-Liga', 'section.league-card:nth-of-type(2) .matches');
+        loadMatches('Serie-A', 'section.league-card:nth-of-type(3) .matches');
+        loadMatches('ligue-1', 'section.league-card:nth-of-type(4) .matches');
+        loadMatches('Bundesliga', 'section.league-card:nth-of-type(5) .matches');
+    </script>
 </body>
 </html>
