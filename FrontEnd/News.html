@@ -156,6 +156,10 @@
                 articles.forEach(article => {
                     const articleDiv = document.createElement('article');
                     articleDiv.className = 'news-card';
+
+                    function openArticle(url) {
+                        window.open(url, '_blank');
+                    }
                     
                     articleDiv.innerHTML = `
                         <div class="news-image-placeholder">
@@ -168,7 +172,19 @@
                         </div>
                     `;
                     
-                    container.appendChild(articleDiv);
+                    // If the article has a URL, wrap the card in a link that opens in a new tab
+                    if (article.url && article.url.length > 0) {
+                        const link = document.createElement('a');
+                        link.href = article.url;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.style.textDecoration = 'none';
+                        link.style.color = 'inherit';
+                        link.appendChild(articleDiv);
+                        container.appendChild(link);
+                    } else {
+                        container.appendChild(articleDiv);
+                    }
                 });
             })
             .catch(error => {

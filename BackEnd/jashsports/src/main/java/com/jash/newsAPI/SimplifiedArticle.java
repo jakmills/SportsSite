@@ -5,4 +5,5 @@ public class SimplifiedArticle {
     public String caption;
     public String datePosted;
     public String image;
+    public String url;
 }
