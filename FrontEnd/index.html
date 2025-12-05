@@ -98,7 +98,7 @@
     </div>
     <script>
         function loadMatches(league, containerSelector) {
-            fetch(`https://jash-sports.onrender.com/football/${league}`)
+            fetch(`http://localhost:7000/football/${league}`)
                 .then(response => response.json())
                 .then(matches => {
                     const container = document.querySelector(containerSelector);

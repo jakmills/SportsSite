@@ -14,8 +14,17 @@ public class footballDATA {
     }
     
     private String getApikey(){
-        Dotenv dotnev = Dotenv.load();
-        return dotnev.get("FOOTBALLDATA_API_KEY");
+        String apiKey = System.getenv("FOOTBALLDATA_API_KEY");
+        if (apiKey != null && !apiKey.isEmpty()) {
+            return apiKey;
+        }
+        try {
+            Dotenv dotenv = Dotenv.load();
+            return dotenv.get("FOOTBALLDATA_API_KEY");
+        } catch (Exception e) {
+            Dotenv dotenv = Dotenv.configure().directory("BackEnd/jashsports").load();
+            return dotenv.get("FOOTBALLDATA_API_KEY");
+        }
     }
 
      public String getMatches(String league) throws Exception {
