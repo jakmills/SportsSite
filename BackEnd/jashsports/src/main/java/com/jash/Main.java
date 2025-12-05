@@ -1,8 +1,5 @@
 package com.jash;
 
-import java.util.ArrayList;
-
-import com.jash.footballDATA.Match;
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
 
@@ -26,8 +23,8 @@ public class Main {
         app.get("/football/{league}", ctx -> {
             try {
                 String league = ctx.pathParam("league").replace("-", " ");
-                ArrayList<Match> matches = fd.getMatches(league);
-                ctx.json(matches);
+                String matchesJson = fd.getMatches(league);
+                ctx.contentType("application/json").result(matchesJson);
             } catch (Exception e) {
                 ctx.status(500).result("Error fetching matches: " + e.getMessage());
             }

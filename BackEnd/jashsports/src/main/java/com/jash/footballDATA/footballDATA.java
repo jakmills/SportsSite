@@ -18,8 +18,7 @@ public class footballDATA {
         return dotnev.get("FOOTBALLDATA_API_KEY");
     }
 
-     public ArrayList<Match> getMatches(String league) throws Exception {
-        try {
+     public String getMatches(String league) throws Exception {
         String apiKey = getApikey();
         OkHttpClient client = new OkHttpClient();
         LocalDate today = LocalDate.now();
@@ -28,15 +27,19 @@ public class footballDATA {
             .addHeader("X-Auth-Token", apiKey)
             .build();
         Response response = client.newCall(request).execute();
-        if (!response.isSuccessful()) {
-            throw new RuntimeException("API request failed: " + response.code());
-        } 
-        String json = response.body().string();
-        Gson gson = new Gson();     // Parse the top-level object
-        MatchesResponse data = gson.fromJson(json, MatchesResponse.class);
-        return data.matches; // This is your ArrayList<Match>
-        } catch (Exception e) {
-            return null;
+        try {
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("API request failed: " + response.code());
+            }
+            String json = response.body().string();
+            Gson gson = new Gson();     // Parse the top-level object
+            MatchesResponse data = gson.fromJson(json, MatchesResponse.class);
+            // Return the matches list as a JSON string
+            return gson.toJson(data.matches);
+        } finally {
+            if (response.body() != null) {
+                try { response.body().close(); } catch (Exception ex) { /* ignore */ }
+            }
         }
     }
 
