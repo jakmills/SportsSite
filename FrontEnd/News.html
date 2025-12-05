@@ -147,7 +147,7 @@
 
         <script>
         function loadNews(league, containerSelector) {
-            fetch(`http://localhost:7000/news/${league}`)
+            fetch(`https://jash-sports.onrender.com/news/${league}`)
             .then(res => res.json())
             .then(articles => {
                 const container = document.querySelector(containerSelector);
