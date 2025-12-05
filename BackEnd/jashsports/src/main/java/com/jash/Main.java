@@ -1,5 +1,6 @@
 package com.jash;
 
+
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
 
@@ -9,7 +10,6 @@ public class Main {
     public static void main(String[] args) {
 
         //sets up javalin server
-
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> rule.anyHost());
