@@ -24,3 +24,6 @@ Thumbs.db
 
 # Log files
 *.log
+
+#Firebase
+jashsports-firebase-adminsdk-fbsvc-94fb012fce.json

@@ -1,5 +1,6 @@
 package com.jash;
 
+
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
 
@@ -8,6 +9,7 @@ import io.javalin.Javalin;
 public class Main {
     public static void main(String[] args) {
 
+        //sets up javalin server
         // sets up javalin server
 
         Javalin app = Javalin.create(config -> {
