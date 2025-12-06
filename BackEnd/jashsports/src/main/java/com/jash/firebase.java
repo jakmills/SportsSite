@@ -1,4 +1,4 @@
-package com.jash.favoriteTeams;
+package com.jash;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ public class firebase {
 
         // Tested this and it works
         if (FirebaseApp.getApps().isEmpty()) {
-            InputStream serviceAccount = new FileInputStream("BackEnd/jashsports/src/main/java/com/jash/favoriteTeams/jashsports-firebase-adminsdk-fbsvc-94fb012fce.json");
+            InputStream serviceAccount = new FileInputStream("BackEnd/jashsports/jashsports-firebase-adminsdk-fbsvc-94fb012fce.json");
 
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
