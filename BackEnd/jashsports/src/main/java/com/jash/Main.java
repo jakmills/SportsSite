@@ -11,7 +11,7 @@ import io.javalin.Javalin;
 public class Main {
     public static void main(String[] args) {
 
-        //sets up javalin server
+        // sets up javalin server
 
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
@@ -32,7 +32,6 @@ public class Main {
                 ctx.status(500).result("Error fetching matches: " + e.getMessage());
             }
         });
-
 
         NewsAPI newsAPI = new NewsAPI();
         app.get("/", ctx -> ctx.result("SportsSite API is running!"));
