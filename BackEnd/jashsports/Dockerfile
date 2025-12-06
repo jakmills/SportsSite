@@ -27,9 +27,6 @@ WORKDIR /app
 # Copy the built JAR from build stage
 COPY --from=build /app/target/jashsports-1.0-SNAPSHOT.jar app.jar
 
-# Copy .env file if it exists in your project root
-COPY .env .env
-
 # Expose port 7000
 EXPOSE 7000
 
