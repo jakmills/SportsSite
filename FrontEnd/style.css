@@ -413,3 +413,74 @@ body {
 .profile-section button:hover {
     background-color: #b71c1c;
 }
+
+.match-card {
+    background: white;
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    border: 1px solid #eaeaea;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.match-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.teams {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.team {
+    width: 40%;
+    text-align: center;
+}
+
+.vs {
+    width: 20%;
+    text-align: center;
+    color: #888;
+    font-weight: 500;
+}
+
+.match-date {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+/* Add this CSS somewhere in your file (e.g., in a <style> tag in the <head>) */
+.league-logo {
+    max-width: 50px; /* Control the size of the logo */
+    height: auto;
+    margin-right: 10px; /* Space between logo and league name */
+    vertical-align: middle; /* Align the image with the text */
+}
+
+/* Flexbox can help align the logo and h2 */
+.league-card {
+    display: flex;
+    flex-direction: column; /* Stack contents vertically */
+}
+
+/* Add this CSS somewhere in your file */
+.team-crest {
+    height: 35px;       /* Set a small, consistent size for inline logos */
+    width: auto;
+    vertical-align: middle; /* Align the logo with the team name text */
+    margin: 0 4px;      /* Small spacing around the logo */
+}
+
+.team-lineup {
+    display: flex;
+    justify-content: space-between; /* Space out the home team, 'vs', and away team */
+    align-items: center;
+    font-weight: bold;
+}

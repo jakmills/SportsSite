@@ -97,34 +97,107 @@
         </section>
     </div>
     <script>
-        function loadMatches(league, containerSelector) {
+        // New parameter: cardSelector to target the entire section
+        function loadMatches(league, matchesContainerSelector, cardSelector) {
             fetch(`http://localhost:7000/football/${league}`)
-                .then(response => response.json())
+                .then(response => {
+                    // Check for network errors (e.g., 404, 500)
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(matches => {
-                    const container = document.querySelector(containerSelector);
-                    container.innerHTML = "";
+                    const container = document.querySelector(matchesContainerSelector);
+                    const card = document.querySelector(cardSelector);
 
+                    // 🌟 STEP 1: Check if the returned array is null or empty
+                    if (!matches || matches.length === 0) {
+                        // If no data, hide the entire league card
+                        if (card) {
+                            card.style.display = 'none';
+                        }
+                        return; // Stop execution
+                    }
+
+                    const leagueImageUrl = matches[0]?.competition?.emblem;
+                    // Data is present, proceed with rendering
+                    container.innerHTML = "";
+                    const h2 = card.querySelector('h2');
+
+                    // 3. Insert the image tag
+                    if (leagueImageUrl && h2) {
+                        const img = document.createElement('img');
+                        img.src = leagueImageUrl;
+                        img.alt = `${league} Logo`;
+                        img.classList.add('league-logo'); // For CSS styling
+
+                        // Insert the image before the <h2> element
+                        card.insertBefore(img, h2);
+                    }
+                    
                     matches.forEach(match => {
+                        // Safely access crest URLs and team names
+                        const homeCrest = match.homeTeam.crest;
+                        const homeName = match.homeTeam.name;
+                        const awayCrest = match.awayTeam.crest;
+                        const awayName = match.awayTeam.name;
+                        
                         const div = document.createElement("div");
-                        div.innerHTML =`
-                            <span class="team">${match.homeTeam.name}</span>
-                            <span class="vs">vs</span>
-                            <span class="team">${match.awayTeam.name}</span> <br>
-                            <span class="score">SCORE</span> <br>
-                            <span class="time">${new Date(match.utcDate).toLocaleString()}</span>
-                            <hr>
-                        `;
+                            div.innerHTML = `
+                                <div class="match-card">
+                                    <div class="teams">
+                                        <span class="team home">${match.homeTeam.name}</span>
+                                        <img src="${homeCrest}" alt="${homeName} Crest" class="team-crest">
+                                        <span class="vs">vs</span>
+                                        <img src="${awayCrest}" alt="${awayName} Crest" class="team-crest">
+                                        <span class="team away">${match.awayTeam.name}</span>
+                                    </div>
+                                    <div class="match-date">
+                                        ${new Date(match.utcDate).toLocaleString()}
+                                    </div>
+                                </div>
+                            `;
                         container.appendChild(div);
                     });
                 })
-                .catch(err => console.error("Error loading matches:", err));
-        }
+        // 🌟 STEP 2: Handle Fetch/Network Errors
+        .catch(err => {
+            console.error(`Error loading matches for ${league}:`, err);
+            // Hide the card on error as well
+            const card = document.querySelector(cardSelector);
+            if (card) {
+                card.style.display = 'none';
+            }
+        });
+}
         // Load immediately when page opens
-        loadMatches('Premier-League', 'section.league-card:nth-of-type(1) .matches');
-        loadMatches('La-Liga', 'section.league-card:nth-of-type(2) .matches');
-        loadMatches('Serie-A', 'section.league-card:nth-of-type(3) .matches');
-        loadMatches('ligue-1', 'section.league-card:nth-of-type(4) .matches');
-        loadMatches('Bundesliga', 'section.league-card:nth-of-type(5) .matches');
+        // Updated function calls with the card selector
+        loadMatches(
+            'Premier-League',
+            'section.league-card:nth-of-type(1) .matches',
+            'section.league-card:nth-of-type(1)' // Selects the whole card
+        );
+        loadMatches(
+            'La-Liga',
+            'section.league-card:nth-of-type(2) .matches',
+            'section.league-card:nth-of-type(2)'
+        );
+        loadMatches(
+            'Serie-A',
+            'section.league-card:nth-of-type(3) .matches',
+            'section.league-card:nth-of-type(3)'
+        );
+        loadMatches(
+            'ligue-1',
+            'section.league-card:nth-of-type(4) .matches',
+            'section.league-card:nth-of-type(4)'
+        );
+        loadMatches(
+            'Bundesliga',
+            'section.league-card:nth-of-type(5) .matches',
+            'section.league-card:nth-of-type(5)'
+        );
     </script>
 </body>
 </html>
