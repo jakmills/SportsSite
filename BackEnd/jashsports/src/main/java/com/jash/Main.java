@@ -1,6 +1,8 @@
 package com.jash;
 
+import java.util.ArrayList;
 
+import com.jash.footballDATA.Match;
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
 
@@ -9,7 +11,7 @@ import io.javalin.Javalin;
 public class Main {
     public static void main(String[] args) {
 
-        //sets up javalin server
+        // sets up javalin server
         // sets up javalin server
 
         Javalin app = Javalin.create(config -> {
@@ -25,8 +27,8 @@ public class Main {
         app.get("/football/{league}", ctx -> {
             try {
                 String league = ctx.pathParam("league").replace("-", " ");
-                String matchesJson = fd.getMatches(league);
-                ctx.contentType("application/json").result(matchesJson);
+                ArrayList<Match> matches = fd.getMatches(league);
+                ctx.json(matches);
             } catch (Exception e) {
                 ctx.status(500).result("Error fetching matches: " + e.getMessage());
             }
