@@ -1,7 +1,5 @@
 package com.jash.footballDATA;
 
-import java.util.List;
-
 public class Match {
     public Area area;
     public Competition competition;

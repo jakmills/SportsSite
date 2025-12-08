@@ -1,5 +1,4 @@
 package com.jash;
-
 import java.util.ArrayList;
 
 import com.jash.footballDATA.Match;
@@ -12,8 +11,6 @@ public class Main {
     public static void main(String[] args) {
 
         // sets up javalin server
-        // sets up javalin server
-
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> rule.anyHost());
