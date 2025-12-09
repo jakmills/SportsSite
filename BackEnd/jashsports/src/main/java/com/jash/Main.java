@@ -49,7 +49,6 @@ public class Main {
         app.get("/userid/{email}", ctx -> {
             firebase fb = new firebase();
             String email = ctx.pathParam("email"); // this should automatically decode the email
-            System.out.println("Decoded email: " + email);
             favTeam ft = new favTeam();
             try {
                 String uid = fb.getUidByEmail(email);
