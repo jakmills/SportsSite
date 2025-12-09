@@ -1,6 +1,7 @@
 package com.jash;
 import java.util.ArrayList;
 
+import com.jash.favoriteTeams.favTeam;
 import com.jash.footballDATA.Match;
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
@@ -43,6 +44,31 @@ public class Main {
                 ctx.status(500).result("Error: " + e.getMessage());
             }
         });
+
+
+        app.get("/userid/{email}", ctx -> {
+            firebase fb = new firebase();
+            String email = ctx.pathParam("email"); // this should automatically decode the email
+            System.out.println("Decoded email: " + email);
+            favTeam ft = new favTeam();
+            try {
+                String uid = fb.getUidByEmail(email);
+                if (uid != null) {
+                    ctx.result(uid);
+                    if(ft.userExists(uid)) {
+                        ctx.result("User found in favorite teams database");
+                    } else {
+                        ft.addUser(uid);
+                        ctx.result("New user added to favorite teams database");
+                    }
+                } else {
+                    ctx.status(404).result("User not found");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
 
     }
 }

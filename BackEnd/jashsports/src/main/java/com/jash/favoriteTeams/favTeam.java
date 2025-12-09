@@ -1,94 +1,116 @@
 package com.jash.favoriteTeams;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.jash.database.database;
 
 public class favTeam {
+
+    // Return a comma-separated list of team names for this user (or empty string if none)
     public String getUserFavTeams(String userID) {
-        String team = "";
+        StringBuilder teams = new StringBuilder();
 
-        try{
-            database db = new database();
-            db.getConnection();
+        String sql = "SELECT t.teamID, t.Name AS teamName, l.Name AS leagueName, l.Country " +
+                     "FROM favorite f " +
+                     "JOIN team t ON f.team_teamID = t.teamID " +
+                     "LEFT JOIN league l ON t.league_leagueID = l.leagueID " +
+                     "WHERE f.user_userID = ?;";
 
-            // Query that retrieves a specified user's favorite teams (must enter in the uniqueID assigned by firebase)
-            PreparedStatement ps = db.getConnection().prepareStatement("SELECT t.teamID, t.Name AS teamName, l.Name AS leagueName, l.Country\r\n" +
-                                "FROM favorite f\r\n" +
-                                "JOIN team t ON f.team_teamID = t.teamID\r\n" +
-                                "LEFT JOIN league l ON t.league_leagueID = l.leagueID\r\n" +
-                                "WHERE f.user_userID = " + userID + ";\r\n");
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                team = rs.getString("teamName");
-            }
-            System.out.println(team); // for testing
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    public boolean addUserFavTeam(String userID, String teamName) {
-        try{
-            database db = new database();
-            db.getConnection();
-
-            // Query that adds a favorite team for a specific user (must enter in the uniqueID assigned by firebase)
-            PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO favorite (user_userID, team_teamID) VALUES (" + userID + "select teamID FROM team WHERE Name = '" + teamName + "');");
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean removeUserFavTeam(String UserID, String teamName) {
-        try{
-            database db = new database();
-            db.getConnection();
-
-            // Query that removes a favorite team for a specific user (must enter in the uniqueID assigned by firebase)
-            PreparedStatement ps = db.getConnection().prepareStatement("DELETE FROM favorite WHERE user_userID = '" + UserID + "' AND team_teamID = (SELECT teamID FROM team WHERE Name = '" + teamName + "');");
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean addUser(String userID) {
-        try{
-            database db = new database();
-            db.getConnection();
-
-            // Query that adds a favorite team for a specific user (must enter in the uniqueID assigned by firebase)
-            PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO user (userID) VALUES ('" + userID + "');");
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean userExists(String userID) {
         try {
             database db = new database();
-            db.getConnection();
-            PreparedStatement ps = db.getConnection().prepareStatement("SELECT 1 FROM user WHERE userID = ? LIMIT 1;");
-            ps.setString(1, userID);
-            ResultSet rs = ps.executeQuery();
-            boolean exists = rs.next();
-            rs.close();
-            ps.close();
-            return exists;
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    boolean first = true;
+                    while (rs.next()) {
+                        if (!first) teams.append(", ");
+                        teams.append(rs.getString("teamName"));
+                        first = false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return teams.toString();
+    }
+
+    // Adds a favorite: uses INSERT ... SELECT to convert team name -> teamID
+    public boolean addUserFavTeam(String userID, String teamName) {
+        String sql = "INSERT INTO favorite (user_userID, team_teamID) " +
+                     "SELECT ?, teamID FROM team WHERE Name = ?;";
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                ps.setString(2, teamName);
+                int rows = ps.executeUpdate();
+                return rows > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Remove favorite by userID + teamName
+    public boolean removeUserFavTeam(String userID, String teamName) {
+        String sql = "DELETE FROM favorite " +
+                     "WHERE user_userID = ? AND team_teamID = (SELECT teamID FROM team WHERE Name = ?);";
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                ps.setString(2, teamName);
+                int rows = ps.executeUpdate();
+                return rows > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Add user
+    public boolean addUser(String userID) {
+        String sql = "INSERT INTO user (userID) VALUES (?);";
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                ps.executeUpdate();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Check existence
+    public boolean userExists(String userID) {
+        String sql = "SELECT 1 FROM user WHERE userID = ? LIMIT 1;";
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;

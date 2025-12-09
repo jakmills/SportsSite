@@ -16,7 +16,7 @@ public class firebase {
 
         // Tested this and it works
         if (FirebaseApp.getApps().isEmpty()) {
-            InputStream serviceAccount = new FileInputStream("BackEnd/jashsports/jashsports-firebase-adminsdk-fbsvc-94fb012fce.json");
+            InputStream serviceAccount = new FileInputStream("add file path here");
 
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
