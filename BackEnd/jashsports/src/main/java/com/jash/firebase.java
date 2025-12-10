@@ -8,6 +8,9 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
 import com.google.firebase.FirebaseApp;
 
 public class firebase {
@@ -16,7 +19,9 @@ public class firebase {
 
         // Tested this and it works
         if (FirebaseApp.getApps().isEmpty()) {
-            InputStream serviceAccount = new FileInputStream("BackEnd/jashsports/jashsports-firebase-adminsdk-fbsvc-94fb012fce.json");
+            Dotenv dotnev = Dotenv.load();
+
+            InputStream serviceAccount = new FileInputStream(dotnev.get("GOOGLE_APPLICATION_CREDENTIALS"));
 
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

@@ -24,8 +24,8 @@ public class NewsAPI {
     public String getNewsJson(String league) throws Exception {
         String apiKey = getApikey();
         String query = (league + " football").replace(" ", "%20");
-        LocalDate twoDaysAgo = LocalDate.now().minusDays(7);
-        String fromDate = twoDaysAgo.toString();
+        LocalDate sevenDaysAgo = LocalDate.now().minusDays(7);
+        String fromDate = sevenDaysAgo.toString();
         String urlString = "https://newsapi.org/v2/everything?q=" + query + "&pageSize=6&sortBy=popularity&language=en&from=" + fromDate + "&apiKey=" + apiKey;
 
         OkHttpClient client = new OkHttpClient();

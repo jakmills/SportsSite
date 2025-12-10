@@ -1,7 +1,7 @@
 package com.jash;
-
 import java.util.ArrayList;
 
+import com.jash.favoriteTeams.favTeam;
 import com.jash.footballDATA.Match;
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
@@ -11,9 +11,7 @@ import io.javalin.Javalin;
 public class Main {
     public static void main(String[] args) {
 
-        // sets up javalin server
-        // sets up javalin server
-
+        // Set up javalin server
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> rule.anyHost());
@@ -46,6 +44,30 @@ public class Main {
                 ctx.status(500).result("Error: " + e.getMessage());
             }
         });
+
+
+        app.get("/userid/{email}", ctx -> {
+            firebase fb = new firebase();
+            String email = ctx.pathParam("email"); // Automatically decodes
+            favTeam ft = new favTeam();
+            try {
+                String uid = fb.getUidByEmail(email);
+                if (uid != null) {
+                    ctx.result(uid);
+                    if(ft.userExists(uid)) {
+                        ctx.result("User found in favorite teams database");
+                    } else {
+                        ft.addUser(uid);
+                        ctx.result("New user added to favorite teams database");
+                    }
+                } else {
+                    ctx.status(404).result("User not found");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
 
     }
 }
