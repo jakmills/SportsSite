@@ -8,7 +8,7 @@ import com.jash.database.database;
 
 public class favTeam {
 
-    // Return a comma-separated list of team names for this user (or empty string if none)
+    // Return a comma-separated list of team names
     public String getUserFavTeams(String userID) {
         StringBuilder teams = new StringBuilder();
 
@@ -40,7 +40,7 @@ public class favTeam {
         return teams.toString();
     }
 
-    // Adds a favorite: uses INSERT ... SELECT to convert team name -> teamID
+    // Adds a favorite by userID + teamName
     public boolean addUserFavTeam(String userID, String teamName) {
         String sql = "INSERT INTO favorite (user_userID, team_teamID) " +
                      "SELECT ?, teamID FROM team WHERE Name = ?;";

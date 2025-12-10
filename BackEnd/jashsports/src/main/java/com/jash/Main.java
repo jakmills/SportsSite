@@ -11,7 +11,7 @@ import io.javalin.Javalin;
 public class Main {
     public static void main(String[] args) {
 
-        // sets up javalin server
+        // Set up javalin server
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> rule.anyHost());
@@ -48,7 +48,7 @@ public class Main {
 
         app.get("/userid/{email}", ctx -> {
             firebase fb = new firebase();
-            String email = ctx.pathParam("email"); // this should automatically decode the email
+            String email = ctx.pathParam("email"); // Automatically decodes
             favTeam ft = new favTeam();
             try {
                 String uid = fb.getUidByEmail(email);

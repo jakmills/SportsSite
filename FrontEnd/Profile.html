@@ -54,7 +54,7 @@
                         })
                         .catch(err => {
                             if(serverRespEl) serverRespEl.textContent = `Server error: ${err.message}`;
-                        }); // Need to test if this works
+                        });
 
                 } else {
                     logoutLink.style.display = 'none';
