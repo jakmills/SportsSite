@@ -3,7 +3,10 @@ package com.jash.favoriteTeams;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.google.gson.Gson;
 import com.jash.database.database;
 
 public class favTeam {
@@ -119,7 +122,7 @@ public class favTeam {
 
     // Returns list of teams that have teamName in their name
     public String getTeamByName(String teamName) {
-        StringBuilder teams = new StringBuilder();
+        List<String> teams = new ArrayList<>();
 
         String sql = "SELECT Name FROM team WHERE Name LIKE ?;";
 
@@ -141,17 +144,15 @@ public class favTeam {
 
                 ps.setString(1, "%" + teamName + "%");
                 try (ResultSet rs = ps.executeQuery()) {
-                    boolean first = true;
                     while (rs.next()) {
-                        if (!first) teams.append(", ");
-                        teams.append(rs.getString("Name"));
-                        first = false;
+                        teams.add(rs.getString("Name"));
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return teams.toString();
+        String json = new Gson().toJson(teams);
+        return json;
     }
 }

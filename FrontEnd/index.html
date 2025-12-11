@@ -66,8 +66,18 @@
 
         fetch(`http://localhost:7000/searchedTeams/${query}`)
             .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(err => console.error(err));
+            .then(data => {
+                if(data.length > 0) {
+                    sessionStorage.setItem('searchedTeams', JSON.stringify(data));
+                    window.location.href = 'searchedTeams.html';
+                } else {
+                    alert('No teams were found. We only have data for top leagues.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('An error occurred'); // while testing i get this pop up
+            });
         });
     </script>
 
