@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.jash.footballDATA.Match;
 import com.jash.footballDATA.footballDATA;
 import com.jash.newsAPI.NewsAPI;
+import java.util.List;
+import java.util.Map;
 
 import io.javalin.Javalin;
 
@@ -23,11 +25,11 @@ public class Main {
         app.start(port);
 
         footballDATA fd = new footballDATA();
-        app.get("/football/{league}", ctx -> {
+
+        app.get("/football/currentMatches", ctx -> {
             try {
-                String league = ctx.pathParam("league").replace("-", " ");
-                ArrayList<Match> matches = fd.getMatches(league);
-                ctx.json(matches);
+                Map<String, List<Match>> groupedMatches = fd.getAllMatchesGroupedByLeague();
+                ctx.json(groupedMatches);
             } catch (Exception e) {
                 ctx.status(500).result("Error fetching matches: " + e.getMessage());
             }
