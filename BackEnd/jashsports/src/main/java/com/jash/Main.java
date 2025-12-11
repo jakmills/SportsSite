@@ -84,5 +84,39 @@ public class Main {
             }
         });
 
+        app.get("/unfavorite/{teamName}/{userID}", ctx -> {
+            String teamName = ctx.pathParam("teamName").replace("-", " ");
+            String userID = ctx.pathParam("userID");
+            favTeam ft = new favTeam();
+            try {
+                boolean success = ft.removeUserFavTeam(userID, teamName);
+                if (success) {
+                    ctx.result("Team unfavorited successfully");
+                } else {
+                    ctx.status(500).result("Failed to unfavorite team");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
+
+        app.get("favorite/{teamName}/{userID}", ctx -> {
+            String teamName = ctx.pathParam("teamName").replace("-", " ");
+            String userID = ctx.pathParam("userID");
+            favTeam ft = new favTeam();
+            System.out.println(teamName);
+            try {
+                boolean success = ft.addUserFavTeam(userID, teamName);
+                if (success) {
+                    ctx.result("Team favorited successfully");
+                } else {
+                    ctx.status(500).result("Failed to favorite team");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
     }
 }
