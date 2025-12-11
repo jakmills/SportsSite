@@ -116,4 +116,42 @@ public class favTeam {
             return false;
         }
     }
+
+    // Returns list of teams that have teamName in their name
+    public String getTeamByName(String teamName) {
+        StringBuilder teams = new StringBuilder();
+
+        String sql = "SELECT Name FROM team WHERE Name LIKE ?;";
+
+        // makes it so search is case insensitive and capitalizes first letter of each word for database match
+        teamName = teamName.toLowerCase();
+        String[] words = teamName.split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String w : words) {
+            sb.append(Character.toUpperCase(w.charAt(0)))
+            .append(w.substring(1).toLowerCase())
+            .append(" ");
+        }
+        teamName = sb.toString().trim();
+
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, "%" + teamName + "%");
+                try (ResultSet rs = ps.executeQuery()) {
+                    boolean first = true;
+                    while (rs.next()) {
+                        if (!first) teams.append(", ");
+                        teams.append(rs.getString("Name"));
+                        first = false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return teams.toString();
+    }
 }

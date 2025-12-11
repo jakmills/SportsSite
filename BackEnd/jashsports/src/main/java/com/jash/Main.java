@@ -68,6 +68,18 @@ public class Main {
             }
         });
 
+        app.get("/searchedTeams/{input}", ctx -> {
+            String input = ctx.pathParam("input").replace("-", " ");
+            favTeam ft = new favTeam();
+            System.out.println(input);
+            try {
+                String teamsJson = ft.getTeamByName(input);
+                ctx.contentType("application/json").result(teamsJson);
+                System.out.println(teamsJson);
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
 
     }
 }

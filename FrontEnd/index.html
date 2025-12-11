@@ -50,10 +50,26 @@
         <a href="YourTeam.html">Your Team</a>
         <a href="News.html">News</a>
         <a href="Profile.html">Profile</a>
+
+        <!-- Search box -->
+        <input type="text" id="searchBox" placeholder="Search teams">
+        <button id="searchBtn">Search</button>
+
         <a href="#" id="logout-link" style="float:right; color:white; margin-right:16px; display:none;" onclick="window.logout()">Logout</a>
     </div>
     
+    <script>
+        // This sends the info to the backend, now i need to figure out how to get the info to the front end and display it
+        // may make a new html file for this
+        document.getElementById("searchBtn").addEventListener("click", () => {
+        const query = encodeURIComponent(document.getElementById("searchBox").value);
 
+        fetch(`http://localhost:7000/searchedTeams/${query}`)
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(err => console.error(err));
+        });
+    </script>
 
     <!-- Live games section: hidden by default and shown only when backend reports ongoing games -->
     <section id="live-games" class="live-games" aria-hidden="true" style="display:none;">
