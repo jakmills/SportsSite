@@ -121,7 +121,7 @@ public class favTeam {
     }
 
     // Returns list of teams that have teamName in their name
-    public String getTeamByName(String teamName) {
+    public String getTeamByName(String teamName, String userID) {
         List<String> teams = new ArrayList<>();
 
         String sql = "SELECT Name FROM team WHERE Name LIKE ?;";
@@ -131,6 +131,7 @@ public class favTeam {
         String[] words = teamName.split("\\s+");
         StringBuilder sb = new StringBuilder();
         for (String w : words) {
+            if (w.isEmpty()) continue;
             sb.append(Character.toUpperCase(w.charAt(0)))
             .append(w.substring(1).toLowerCase())
             .append(" ");
@@ -145,7 +146,13 @@ public class favTeam {
                 ps.setString(1, "%" + teamName + "%");
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        teams.add(rs.getString("Name"));
+                        String name = rs.getString("Name");
+                        // if userID provided and this team is a favorite, append '*'
+                        if (userID != null && !userID.isBlank() && isFavorite(userID, name)) {
+                            teams.add(name + "*");
+                        } else {
+                            teams.add(name);
+                        }
                     }
                 }
             }
@@ -154,5 +161,27 @@ public class favTeam {
         }
         String json = new Gson().toJson(teams);
         return json;
+    }
+
+    // Check if team is a favorite for user
+    private boolean isFavorite(String userID, String teamName) {
+        String sql = "SELECT 1 FROM favorite f " +
+                     "JOIN team t ON f.team_teamID = t.teamID " +
+                     "WHERE f.user_userID = ? AND t.Name = ? LIMIT 1;";
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                ps.setString(2, teamName);
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -65,12 +65,23 @@
         const teams = JSON.parse(sessionStorage.getItem('searchedTeams')) || [];
         const list = document.getElementById('resultsList');
 
+        // checks if any teams has * (means a user selected them as favorite), then have a colored in button showing they are favorited
+
         if(teams.length === 0) {
             list.innerHTML = '<li>No teams found.</li>';
         } else {
             teams.forEach(team => {
+                // checks if any teams has * (means a user selected them as favorite), then have a colored in button showing they are favorited
+                if(team.endsWith('*')) {
+                    team = team.slice(0, -1); // Remove the asterisk for display
+                    const li = document.createElement('li');
+                    li.innerHTML = `${team} <button style="background-color: yellow;">Favorited</button>`;
+                    list.appendChild(li);
+                    return;
+                }
+                // since no *, just display normally with a white button
                 const li = document.createElement('li');
-                li.textContent = team;
+                li.innerHTML = `${team} <button style="background-color: white;">Favorite</button>`;
                 list.appendChild(li);
             });
         }

@@ -60,11 +60,17 @@
     
     <script>
         // This sends the info to the backend, now i need to figure out how to get the info to the front end and display it
-        // may make a new html file for this
         document.getElementById("searchBtn").addEventListener("click", () => {
         const query = encodeURIComponent(document.getElementById("searchBox").value);
+        const user = auth.currentUser;
 
-        fetch(`http://localhost:7000/searchedTeams/${query}`)
+        // Checks to see if a user is logged in, if not, alerts them to log in
+        if (user === null) {
+            alert('Please log in to search for teams.');
+            return;
+        }
+
+        fetch(`http://localhost:7000/searchedTeams/${query}/${user.uid}`) // sends searched result and user unique ID to frontend
             .then(response => response.json())
             .then(data => {
                 if(data.length > 0) {
@@ -76,7 +82,7 @@
             })
             .catch(err => {
                 console.error(err);
-                alert('An error occurred'); // while testing i get this pop up
+                alert('An error occurred');
             });
         });
     </script>

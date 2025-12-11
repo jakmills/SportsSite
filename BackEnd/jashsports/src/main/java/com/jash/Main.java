@@ -68,12 +68,15 @@ public class Main {
             }
         });
 
-        app.get("/searchedTeams/{input}", ctx -> {
+        app.get("/searchedTeams/{input}/{userID}", ctx -> {
             String input = ctx.pathParam("input").replace("-", " ");
+            String userID = ctx.pathParam("userID");
+            System.out.println(userID);
+            System.out.println(input);
             favTeam ft = new favTeam();
             System.out.println(input);
             try {
-                String teamsJson = ft.getTeamByName(input);
+                String teamsJson = ft.getTeamByName(input, userID);
                 ctx.contentType("application/json").result(teamsJson);
                 System.out.println(teamsJson);
             } catch (Exception e) {
