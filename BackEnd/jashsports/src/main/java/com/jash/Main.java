@@ -118,5 +118,17 @@ public class Main {
             }
         });
 
+        app.get("/favoriteTeams/{userID}", ctx -> {
+            String userID = ctx.pathParam("userID");
+            favTeam ft = new favTeam();
+            try {
+                String favTeamsJson = ft.getUserFavTeams(userID);
+                System.out.println(favTeamsJson);
+                ctx.contentType("application/json").result(favTeamsJson);
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
     }
 }
