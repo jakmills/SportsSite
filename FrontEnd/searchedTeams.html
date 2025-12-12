@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Results</title>
+    <!-- Firebase for auth check -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJuUtvyyzUgl9uafIf-O86bSs3LHMhHhc",
+            authDomain: "jashsports.firebaseapp.com",
+            projectId: "jashsports",
+            storageBucket: "jashsports.firebasestorage.app",
+            messagingSenderId: "92796247948",
+            appId: "1:92796247948:web:997254dd6a3382efa3c0a9",
+            measurementId: "G-50TF15H427"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.auth = auth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+
+        // Auth state listener
+        onAuthStateChanged(auth, (user) => {
+            const logoutLink = document.getElementById('logout-link');
+            if (user) {
+                logoutLink.style.display = 'inline';
+            } else {
+                logoutLink.style.display = 'none';
+            }
+        });
+
+        // Logout function
+        window.logout = async () => {
+            await signOut(auth);
+            window.location.href = 'News.html';
+        };
+    </script>
+</head>
+<body>
+    <div class = "navbar">
+        <a href="index.html">Home</a>
+        <a href="YourTeam.html">Your Team</a>
+        <a href="News.html">News</a>
+        <a href="Profile.html">Profile</a>
+
+        <a href="#" id="logout-link" style="float:right; color:white; margin-right:16px; display:none;" onclick="window.logout()">Logout</a>
+    </div>
+    
+    <h1>Search Results</h1>
+    <ul id="resultsList"></ul>
+
+    <script>
+        const teams = JSON.parse(sessionStorage.getItem('searchedTeams')) || [];
+        const list = document.getElementById('resultsList');
+
+        // helper to set button visuals
+        function setFavButtonVisual(btn, isFav) {
+            btn.textContent = isFav ? 'Favorited' : 'Favorite';
+            btn.style.backgroundColor = isFav ? 'yellow' : 'white';
+            btn.style.cursor = 'pointer';
+        }
+
+        // convert "Manchester United" -> "Manchester-United" (server expects hyphens)
+        function hyphenate(name) {
+            return name.trim().replace(/\s+/g, '-');
+        }
+
+        // call server endpoints (they are GET routes in your Javalin code)
+        async function callServerToggle(teamName, userID, action) {
+            // action is 'favorite' or 'unfavorite' matching your endpoints
+            const hyphenName = hyphenate(teamName);
+            const url = `http://localhost:7000/${action}/${encodeURIComponent(hyphenName)}/${encodeURIComponent(userID)}`;
+            try {
+                const res = await fetch(url); // default method is GET which matches your Javalin handlers
+                if (!res.ok) {
+                    const text = await res.text().catch(()=>res.statusText);
+                    throw new Error(`Server error ${res.status}: ${text}`);
+                }
+                return true;
+            } catch (err) {
+                console.error('Server toggle error:', err);
+                return false;
+            }
+        }
+
+        function renderResults() {
+            list.innerHTML = '';
+            if (teams.length === 0) {
+                list.innerHTML = '<li>No teams found.</li>';
+                return;
+            }
+
+            teams.forEach((raw, idx) => {
+                // raw expected to be a string, possibly ending with '*'
+                const isFav = (typeof raw === 'string') && raw.endsWith('*');
+                const teamName = isFav ? raw.slice(0, -1) : raw;
+
+                const li = document.createElement('li');
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = teamName;
+                nameSpan.style.marginRight = '8px';
+
+                const btn = document.createElement('button');
+                btn.className = 'favButton';
+                setFavButtonVisual(btn, isFav);
+
+                // attach click handler (closure captures `teamName`, `idx`, and `raw`)
+                btn.onclick = async (event) => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to favorite teams.');
+                        return;
+                    }
+
+                    const adding = !(btn.textContent === 'Favorited'); // toggled state
+                    // optimistic UI
+                    setFavButtonVisual(btn, adding);
+
+                    // call backend: use 'favorite' or 'unfavorite' to match your javalin routes
+                    const ok = await callServerToggle(teamName, user.uid, adding ? 'favorite' : 'unfavorite');
+
+                    if (!ok) {
+                        // revert UI on failure
+                        setFavButtonVisual(btn, !adding);
+                        alert('Could not update favorite on server. Try again.');
+                        return;
+                    }
+
+                    // success -> update local teams array and sessionStorage (string style with '*')
+                    teams[idx] = adding ? (teamName + '*') : teamName;
+                    try {
+                        sessionStorage.setItem('searchedTeams', JSON.stringify(teams));
+                    } catch (e) {
+                        console.warn('Could not write to sessionStorage:', e);
+                    }
+                };
+
+                li.appendChild(nameSpan);
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+
+        renderResults();
+    </script>
+
+</body>
+</html>

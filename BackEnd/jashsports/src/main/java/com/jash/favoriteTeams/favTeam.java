@@ -3,33 +3,39 @@ package com.jash.favoriteTeams;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import com.google.gson.Gson;
 import com.jash.database.database;
 
 public class favTeam {
 
-    // Return a comma-separated list of team names
-    public String getUserFavTeams(String userID) {
-        StringBuilder teams = new StringBuilder();
+    // Returns user's favorite teams as JSON
+        public String getUserFavTeams(String userID) {
+        List<Map<String, String>> teams = new ArrayList<>();
 
         String sql = "SELECT t.teamID, t.Name AS teamName, l.Name AS leagueName, l.Country " +
-                     "FROM favorite f " +
-                     "JOIN team t ON f.team_teamID = t.teamID " +
-                     "LEFT JOIN league l ON t.league_leagueID = l.leagueID " +
-                     "WHERE f.user_userID = ?;";
+                    "FROM favorite f " +
+                    "JOIN team t ON f.team_teamID = t.teamID " +
+                    "LEFT JOIN league l ON t.league_leagueID = l.leagueID " +
+                    "WHERE f.user_userID = ?;";
 
         try {
             database db = new database();
             try (Connection conn = db.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 ps.setString(1, userID);
+
                 try (ResultSet rs = ps.executeQuery()) {
-                    boolean first = true;
                     while (rs.next()) {
-                        if (!first) teams.append(", ");
-                        teams.append(rs.getString("teamName"));
-                        first = false;
+                        Map<String, String> team = new HashMap<>();
+                        team.put("name", rs.getString("teamName"));
+                        team.put("league", rs.getString("leagueName"));
+                        teams.add(team);
                     }
                 }
             }
@@ -37,8 +43,12 @@ public class favTeam {
             e.printStackTrace();
         }
 
-        return teams.toString();
+        Map<String, Object> response = new HashMap<>();
+        response.put("teams", teams);
+
+        return new Gson().toJson(response);
     }
+
 
     // Adds a favorite by userID + teamName
     public boolean addUserFavTeam(String userID, String teamName) {
@@ -107,6 +117,71 @@ public class favTeam {
                  PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 ps.setString(1, userID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Returns list of teams that have teamName in their name
+    public String getTeamByName(String teamName, String userID) {
+        List<String> teams = new ArrayList<>();
+
+        String sql = "SELECT Name FROM team WHERE Name LIKE ?;";
+
+        // Makes it so search is case insensitive and capitalizes first letter of each word for database match
+        teamName = teamName.toLowerCase();
+        String[] words = teamName.split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String w : words) {
+            if (w.isEmpty()) continue;
+            sb.append(Character.toUpperCase(w.charAt(0)))
+            .append(w.substring(1).toLowerCase())
+            .append(" ");
+        }
+        teamName = sb.toString().trim();
+
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, "%" + teamName + "%");
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String name = rs.getString("Name");
+                        // if userID provided and this team is a favorite, append '*'
+                        if (userID != null && !userID.isBlank() && isFavorite(userID, name)) {
+                            teams.add(name + "*");
+                        } else {
+                            teams.add(name);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String json = new Gson().toJson(teams);
+        return json;
+    }
+
+    // Check if team is a favorite for user
+    private boolean isFavorite(String userID, String teamName) {
+        String sql = "SELECT 1 FROM favorite f " +
+                     "JOIN team t ON f.team_teamID = t.teamID " +
+                     "WHERE f.user_userID = ? AND t.Name = ? LIMIT 1;";
+        try {
+            database db = new database();
+            try (Connection conn = db.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, userID);
+                ps.setString(2, teamName);
                 try (ResultSet rs = ps.executeQuery()) {
                     return rs.next();
                 }

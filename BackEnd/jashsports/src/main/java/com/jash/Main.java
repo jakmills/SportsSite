@@ -70,5 +70,67 @@ public class Main {
             }
         });
 
+        app.get("/searchedTeams/{input}/{userID}", ctx -> {
+            String input = ctx.pathParam("input").replace("-", " ");
+            String userID = ctx.pathParam("userID");
+            System.out.println(userID);
+            System.out.println(input);
+            favTeam ft = new favTeam();
+            System.out.println(input);
+            try {
+                String teamsJson = ft.getTeamByName(input, userID);
+                ctx.contentType("application/json").result(teamsJson);
+                System.out.println(teamsJson);
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
+        app.get("/unfavorite/{teamName}/{userID}", ctx -> {
+            String teamName = ctx.pathParam("teamName").replace("-", " ");
+            String userID = ctx.pathParam("userID");
+            favTeam ft = new favTeam();
+            try {
+                boolean success = ft.removeUserFavTeam(userID, teamName);
+                if (success) {
+                    ctx.result("Team unfavorited successfully");
+                } else {
+                    ctx.status(500).result("Failed to unfavorite team");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
+
+        app.get("favorite/{teamName}/{userID}", ctx -> {
+            String teamName = ctx.pathParam("teamName").replace("-", " ");
+            String userID = ctx.pathParam("userID");
+            favTeam ft = new favTeam();
+            System.out.println(teamName);
+            try {
+                boolean success = ft.addUserFavTeam(userID, teamName);
+                if (success) {
+                    ctx.result("Team favorited successfully");
+                } else {
+                    ctx.status(500).result("Failed to favorite team");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
+        app.get("/favoriteTeams/{userID}", ctx -> {
+            String userID = ctx.pathParam("userID");
+            favTeam ft = new favTeam();
+            try {
+                String favTeamsJson = ft.getUserFavTeams(userID);
+                System.out.println(favTeamsJson);
+                ctx.contentType("application/json").result(favTeamsJson);
+            } catch (Exception e) {
+                ctx.status(500).result("Error: " + e.getMessage());
+            }
+        });
+
     }
 }

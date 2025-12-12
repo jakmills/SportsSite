@@ -50,10 +50,42 @@
         <a href="YourTeam.html">Your Team</a>
         <a href="News.html">News</a>
         <a href="Profile.html">Profile</a>
+
+        <!-- Search box -->
+        <input type="text" id="searchBox" placeholder="Search for teams...">
+        <button id="searchBtn">Search</button>
+
         <a href="#" id="logout-link" style="float:right; color:white; margin-right:16px; display:none;" onclick="window.logout()">Logout</a>
     </div>
     
+    <script>
+        // This sends the info to the backend, now i need to figure out how to get the info to the front end and display it
+        document.getElementById("searchBtn").addEventListener("click", () => {
+        const query = encodeURIComponent(document.getElementById("searchBox").value);
+        const user = auth.currentUser;
 
+        // Checks to see if a user is logged in, if not, alerts them to log in
+        if (user === null) {
+            alert('Please log in to search for teams.');
+            return;
+        }
+
+        fetch(`http://localhost:7000/searchedTeams/${query}/${user.uid}`) // sends searched result and user unique ID to frontend
+            .then(response => response.json())
+            .then(data => {
+                if(data.length > 0) {
+                    sessionStorage.setItem('searchedTeams', JSON.stringify(data));
+                    window.location.href = 'searchedTeams.html';
+                } else {
+                    alert('No teams were found. We only have data for top leagues.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('An error occurred');
+            });
+        });
+    </script>
 
     <!-- Live games section: hidden by default and shown only when backend reports ongoing games -->
     <section id="live-games" class="live-games" aria-hidden="true" style="display:none;">

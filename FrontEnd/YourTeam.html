@@ -30,8 +30,11 @@
             const logoutLink = document.getElementById('logout-link');
             if (user) {
                 logoutLink.style.display = 'inline';
+                loadTeams(user);
             } else {
                 logoutLink.style.display = 'none';
+                alert("Please log in to view your favorite teams.");
+                window.location.href = 'login.html';
             }
         });
 
@@ -40,6 +43,39 @@
             await signOut(auth);
             window.location.href = 'YourTeam.html';
         };
+
+        async function loadTeams(user) {
+                    console.log("Loading favorite teams for user:", user.uid);
+                    try {
+                        const response = await fetch(`http://localhost:7000/favoriteTeams/${user.uid}`);
+
+                        if (!response.ok) {
+                            console.error("Server error:", await response.text());
+                            return;
+                        }
+
+                        const data = await response.json();
+
+                        const teamsContainer = document.querySelector('.teams-container');
+                        teamsContainer.innerHTML = '';
+                        data.teams.forEach(team => {
+                            const teamCard = document.createElement('div');
+                            teamCard.className = 'team-match-card';
+                            teamCard.innerHTML = `
+                                <div class="team-info">
+                                    <div class="team-logo-placeholder">[${team.name.charAt(0)}]</div>
+                                    <div class="team-details">
+                                        <h3>"${team.name}"</h3>
+                                        <p>${team.league}</p>
+                                    </div>
+                                </div>
+                                `;
+                            teamsContainer.appendChild(teamCard);
+                        });
+                    } catch (error) {
+                        console.error('Error fetching favorite teams:', error);
+                    }
+                }
     </script>
 </head>
 <body>
