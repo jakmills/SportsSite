@@ -19,7 +19,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime stage
-FROM amazoncorretto:21-alpine
+FROM amazoncorretto:21
 
 # Set working directory
 WORKDIR /app
