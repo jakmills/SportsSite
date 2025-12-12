@@ -2,6 +2,9 @@ package com.jash.footballDATA;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
@@ -19,13 +22,13 @@ public class footballDATA {
         return dotnev.get("FOOTBALLDATA_API_KEY");
     }
 
-    public ArrayList<Match> getMatches(String league) throws Exception {
+    public ArrayList<Match> getAllMatches() throws Exception {
         try {
             String apiKey = getApikey();
             OkHttpClient client = new OkHttpClient();
             LocalDate today = LocalDate.now();
             Request request = new Request.Builder()
-                    .url("https://api.football-data.org/v4/competitions/" + getLeagueID(league) + "/matches?dateFrom="
+                    .url("https://api.football-data.org/v4/matches?dateFrom="
                             + today.toString() + "&dateTo=" + today.toString())
                     .addHeader("X-Auth-Token", apiKey)
                     .build();
@@ -42,18 +45,17 @@ public class footballDATA {
         }
     }
 
-    public int getLeagueID(String league) {
-        switch (league.toLowerCase().replaceAll("\\s", "")) {
-            case "championsleague":
-                return 2001;
-            case "premierleague":
-                return 2021;
-            case "laliga":
-                return 2014;
-            case "seriea":
-                return 2019;
-            default:
-                return -1;
+    public Map<String, List<Match>> getAllMatchesGroupedByLeague() {
+        List<Match> allMatches = null;
+        try {
+            allMatches = getAllMatches();
+        } catch (Exception e) {
+            System.out.println(e.toString());
         }
+        Map<String, List<Match>> groupedMatches = allMatches.stream()
+                .collect(Collectors.groupingBy(
+                        match -> match.competition.name));
+
+        return groupedMatches;
     }
 }
