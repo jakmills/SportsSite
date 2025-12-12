@@ -29,7 +29,7 @@ public class footballDATA {
             LocalDate today = LocalDate.now();
             Request request = new Request.Builder()
                     .url("https://api.football-data.org/v4/matches?dateFrom="
-                            + today.toString() + "&dateTo=" + today.toString())
+                            + today.toString() + "&dateTo=" + today.plusDays(1).toString())
                     .addHeader("X-Auth-Token", apiKey)
                     .build();
             Response response = client.newCall(request).execute();
