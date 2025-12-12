@@ -65,139 +65,104 @@
 
     <!-- Make the section for league games -->
     <!-- Section for day of the week and ability to switch days to see different games -->
-    <div class="leagues-container">
-        <section class="league-card">
-            <h2>Premier League</h2>
-            <div class="matches">
-            </div>
-        </section>
-        
-        <section class="league-card">
-            <h2>La Liga</h2>
-            <div class="matches">
-            </div>
-        </section>
-        
-        <section class="league-card">
-            <h2>Serie A</h2>
-            <div class="matches">
-            </div>
-        </section>
-
-        <section class="league-card">
-            <h2>Ligue 1</h2>
-            <div class="matches">
-            </div>
-        </section>
-
-        <section class="league-card">
-            <h2>Bundesliga</h2>
-            <div class="matches">
-            </div>
-        </section>
+    <div class="leagues-container" id="all-leagues-container">
+    
     </div>
-    <script>
-        // New parameter: cardSelector to target the entire section
-        function loadMatches(league, matchesContainerSelector, cardSelector) {
-            fetch(`http://localhost:7000/football/${league}`)
-                .then(response => {
-                    // Check for network errors (e.g., 404, 500)
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(matches => {
-                    const container = document.querySelector(matchesContainerSelector);
-                    const card = document.querySelector(cardSelector);
-
-                    // 🌟 STEP 1: Check if the returned array is null or empty
-                    if (!matches || matches.length === 0) {
-                        // If no data, hide the entire league card
-                        if (card) {
-                            card.style.display = 'none';
-                        }
-                        return; // Stop execution
-                    }
-
-                    const leagueImageUrl = matches[0]?.competition?.emblem;
-                    // Data is present, proceed with rendering
-                    container.innerHTML = "";
-                    const h2 = card.querySelector('h2');
-
-                    // 3. Insert the image tag
-                    if (leagueImageUrl && h2) {
-                        const img = document.createElement('img');
-                        img.src = leagueImageUrl;
-                        img.alt = `${league} Logo`;
-                        img.classList.add('league-logo'); // For CSS styling
-
-                        // Insert the image before the <h2> element
-                        card.insertBefore(img, h2);
-                    }
-                    
-                    matches.forEach(match => {
-                        // Safely access crest URLs and team names
-                        const homeCrest = match.homeTeam.crest;
-                        const homeName = match.homeTeam.name;
-                        const awayCrest = match.awayTeam.crest;
-                        const awayName = match.awayTeam.name;
-                        
-                        const div = document.createElement("div");
-                            div.innerHTML = `
-                                <div class="match-card">
-                                    <div class="teams">
-                                        <span class="team home">${match.homeTeam.name}</span>
-                                        <img src="${homeCrest}" alt="${homeName} Crest" class="team-crest">
-                                        <span class="vs">vs</span>
-                                        <img src="${awayCrest}" alt="${awayName} Crest" class="team-crest">
-                                        <span class="team away">${match.awayTeam.name}</span>
-                                    </div>
-                                    <div class="match-date">
-                                        ${new Date(match.utcDate).toLocaleString()}
-                                    </div>
-                                </div>
-                            `;
-                        container.appendChild(div);
-                    });
-                })
-        // 🌟 STEP 2: Handle Fetch/Network Errors
-        .catch(err => {
-            console.error(`Error loading matches for ${league}:`, err);
-            // Hide the card on error as well
-            const card = document.querySelector(cardSelector);
-            if (card) {
-                card.style.display = 'none';
+            <script>
+                function loadAllGroupedMatches() {
+                    fetch('http://localhost:7000/football/currentMatches') // Your new endpoint
+                     .then(response => {
+            // Check for network errors (e.g., 404, 500)
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            return response.json();
+        })
+        .then(groupedMatches => {
+            const allLeaguesContainer = document.getElementById('all-leagues-container');
+            // Clear the main container before inserting new content
+            allLeaguesContainer.innerHTML = "";
+
+            // --- Begin Iteration for Grouped Leagues ---
+            
+            // Iterate over the keys (league names) of the grouped Map
+            for (const leagueName in groupedMatches) {
+                const matches = groupedMatches[leagueName];
+                
+                // 🌟 STEP 1: Check if the returned array is null or empty
+                // (Equivalent to the single-league check, but here we skip the card creation)
+                if (!matches || matches.length === 0) {
+                    continue; // Skip this league if there are no matches
+                }
+                
+                // --- Dynamic League Card Creation (since we removed the hardcoded HTML) ---
+                const card = document.createElement("section");
+                card.classList.add("league-card");
+                
+                // Add the League Name heading (we need this to insert the logo before it)
+                card.innerHTML = `<h2>${leagueName}</h2><div class="matches"></div>`;
+                
+                const matchesContainer = card.querySelector('.matches');
+                const h2 = card.querySelector('h2');
+                
+                // Assuming the emblem field is now named 'emblem'
+                const leagueImageUrl = matches[0]?.competition?.emblem; 
+                
+                // 3. Insert the image tag
+                if (leagueImageUrl && h2) {
+                    const img = document.createElement('img');
+                    img.src = leagueImageUrl;
+                    img.alt = `${leagueName} Logo`;
+                    img.classList.add('league-logo'); 
+
+                    // Insert the image before the <h2> element
+                    card.insertBefore(img, h2);
+                }
+                
+                // --- Match Rendering (using the EXACT provided HTML structure) ---
+
+                // Data is present, proceed with rendering
+                matchesContainer.innerHTML = "";
+                
+                matches.forEach(match => {
+                    // Safely access crest URLs and team names
+                    const homeCrest = match.homeTeam.crest;
+                    const homeName = match.homeTeam.name;
+                    const awayCrest = match.awayTeam.crest;
+                    const awayName = match.awayTeam.name;
+                    
+                    const div = document.createElement("div");
+                    div.innerHTML = `
+                        <div class="match-card">
+                            <div class="teams">
+                                <span class="team home">${match.homeTeam.name}</span>
+                                <img src="${homeCrest}" alt="${homeName} Crest" class="team-crest">
+                                <span class="vs">vs</span>
+                                <img src="${awayCrest}" alt="${awayName} Crest" class="team-crest">
+                                <span class="team away">${match.awayTeam.name}</span>
+                            </div>
+                            <div class="match-date">
+                                ${new Date(match.utcDate).toLocaleString()}
+                            </div>
+                        </div>
+                    `;
+                    matchesContainer.appendChild(div);
+                });
+
+                // Append the fully populated league card to the main container
+                allLeaguesContainer.appendChild(card);
+            }
+            // --- End Iteration for Grouped Leagues ---
+        })
+        // 🌟 STEP 2: Handle Fetch/Network Errors (Hide all leagues if the main call fails)
+        .catch(err => {
+            console.error("Error loading all grouped matches:", err);
+            const container = document.getElementById('all-leagues-container');
+            // Show a generic error message instead of hiding specific cards
+            container.innerHTML = `<p style="color: red;">Failed to load match data. Please check the server connection.</p>`;
         });
 }
-        // Load immediately when page opens
-        // Updated function calls with the card selector
-        loadMatches(
-            'Premier-League',
-            'section.league-card:nth-of-type(1) .matches',
-            'section.league-card:nth-of-type(1)' // Selects the whole card
-        );
-        loadMatches(
-            'La-Liga',
-            'section.league-card:nth-of-type(2) .matches',
-            'section.league-card:nth-of-type(2)'
-        );
-        loadMatches(
-            'Serie-A',
-            'section.league-card:nth-of-type(3) .matches',
-            'section.league-card:nth-of-type(3)'
-        );
-        loadMatches(
-            'ligue-1',
-            'section.league-card:nth-of-type(4) .matches',
-            'section.league-card:nth-of-type(4)'
-        );
-        loadMatches(
-            'Bundesliga',
-            'section.league-card:nth-of-type(5) .matches',
-            'section.league-card:nth-of-type(5)'
-        );
-    </script>
+                loadAllGroupedMatches();
+            </script>
 </body>
 </html>
