@@ -156,11 +156,18 @@
                 matchesContainer.innerHTML = "";
                 
                 matches.forEach(match => {
-                    // Safely access crest URLs and team names
                     const homeCrest = match.homeTeam.crest;
                     const homeName = match.homeTeam.name;
                     const awayCrest = match.awayTeam.crest;
                     const awayName = match.awayTeam.name;
+
+                    // 🌟 NEW: Extract Score and Duration Details
+                    const fullTimeHomeScore = match.score.fullTime ? match.score.fullTime.home : '-';
+                    const fullTimeAwayScore = match.score.fullTime ? match.score.fullTime.away : '-';
+                    const duration = match.score.duration || 'N/A';
+                    
+                    // Create a readable score display
+                    const scoreDisplay = `${fullTimeHomeScore} - ${fullTimeAwayScore}`;
                     
                     const div = document.createElement("div");
                     div.innerHTML = `
@@ -168,29 +175,26 @@
                             <div class="teams">
                                 <span class="team home">${match.homeTeam.name}</span>
                                 <img src="${homeCrest}" alt="${homeName} Crest" class="team-crest">
-                                <span class="vs">vs</span>
+                                <span class="vs">
+                                    <span class="score">${scoreDisplay}</span> </span>
                                 <img src="${awayCrest}" alt="${awayName} Crest" class="team-crest">
                                 <span class="team away">${match.awayTeam.name}</span>
                             </div>
                             <div class="match-date">
-                                ${new Date(match.utcDate).toLocaleString()}
-                            </div>
+                                <span>${new Date(match.utcDate).toLocaleString()}</span>
+                                <span class="duration"> | ${duration}</span> </div>
                         </div>
                     `;
                     matchesContainer.appendChild(div);
                 });
 
-                // Append the fully populated league card to the main container
                 allLeaguesContainer.appendChild(card);
             }
-            // --- End Iteration for Grouped Leagues ---
         })
-        // 🌟 STEP 2: Handle Fetch/Network Errors (Hide all leagues if the main call fails)
         .catch(err => {
             console.error("Error loading all grouped matches:", err);
             const container = document.getElementById('all-leagues-container');
-            // Show a generic error message instead of hiding specific cards
-            container.innerHTML = `<p style="color: red;">Failed to load match data. Please check the server connection.</p>`;
+            container.innerHTML = `<p style="color: red;">Failed to load match data. Please ensure the backend server is running on port 7000.</p>`;
         });
 }
                 loadAllGroupedMatches();
