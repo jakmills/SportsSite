@@ -18,8 +18,9 @@ public class footballDATA {
     }
 
     private String getApikey() {
-        Dotenv dotnev = Dotenv.load();
-        return dotnev.get("FOOTBALLDATA_API_KEY");
+        // Dotenv dotnev = Dotenv.load();
+        // return dotnev.get("FOOTBALLDATA_API_KEY");
+        return System.getenv("FOOTBALLDATA_API_KEY");
     }
 
     public ArrayList<Match> getAllMatches() throws Exception {

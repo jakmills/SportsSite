@@ -19,9 +19,11 @@ public class firebase {
 
         // Tested this and it works
         if (FirebaseApp.getApps().isEmpty()) {
-            Dotenv dotnev = Dotenv.load();
+            // Dotenv dotnev = Dotenv.load();
 
-            InputStream serviceAccount = new FileInputStream(dotnev.get("GOOGLE_APPLICATION_CREDENTIALS"));
+            // InputStream serviceAccount = new FileInputStream(dotnev.get("GOOGLE_APPLICATION_CREDENTIALS"));
+
+            InputStream serviceAccount = new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
 
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
