@@ -484,3 +484,55 @@ body {
     align-items: center;
     font-weight: bold;
 }
+
+#date-selector {
+    display: flex;
+    justify-content: space-between; /* Pushes the arrows to the edges */
+    align-items: center;
+    
+    /* Dark background from the image */
+    background-color: #333; 
+    border-radius: 8px; /* Optional slight rounding */
+    padding: 10px 15px; /* Padding inside the bar */
+    height: 39px; /* Gives the bar a fixed height */
+    width: 100%; /* Spans the full width */
+    max-width: 500px; /* Keeps it contained for a cleaner look */
+    margin: 20px auto; /* Centers the selector */
+}
+
+/* --- Current Date Text Styling --- */
+#current-date-display {
+    /* Centered text in the middle */
+    flex-grow: 1; 
+    text-align: center;
+    
+    /* Font style matching the image */
+    font-size: 1.6em; 
+    font-weight: 500;
+    color: white; /* White text */
+    
+    /* Reset background/border used in the old version */
+    background-color: transparent; 
+    padding: 0;
+}
+
+/* --- Navigation Button Styling --- */
+.date-nav-button {
+    background-color: #555555; /* Dark gray background for the buttons */
+    border: none;
+    border-radius: 50%; /* Makes them circular */
+    color: white; /* White arrow */
+    font-size: 1.5em; 
+    line-height: 1; /* Aligns the arrow symbol vertically */
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.date-nav-button:hover {
+    background-color: #666666; /* Slightly lighter on hover */
+}

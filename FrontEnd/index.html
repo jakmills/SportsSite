@@ -94,110 +94,199 @@
         </div>
     </section>
 
+    <div id="date-selector">
+    <button class="date-nav-button left" onclick="changeDate(-1)">
+        &lt;
+    </button>
+    
+    <div id="current-date-display">Today</div>
+    
+    <button class="date-nav-button right" onclick="changeDate(1)">
+        &gt;
+    </button>
+</div>
+
     <!-- Make the section for league games -->
     <!-- Section for day of the week and ability to switch days to see different games -->
     <div class="leagues-container" id="all-leagues-container">
     
     </div>
             <script>
-                function loadAllGroupedMatches() {
-                    fetch('http://localhost:7000/football/currentMatches') // Your new endpoint
-                     .then(response => {
-            // Check for network errors (e.g., 404, 500)
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(groupedMatches => {
-            const allLeaguesContainer = document.getElementById('all-leagues-container');
-            // Clear the main container before inserting new content
-            allLeaguesContainer.innerHTML = "";
+                // Global variables to store the fetched data and control navigation
+    let allMatchesData = {};
+    let availableDates = [];
+    let selectedDateIndex = 0;
 
-            // --- Begin Iteration for Grouped Leagues ---
+    // Helper function to format the Date object into the ISO string "YYYY-MM-DD"
+    // This format MUST match the format used in your Java backend grouping key.
+    const DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+    });
+
+    // Helper function to display the date nicely (e.g., "Monday, Dec 15")
+    const DISPLAY_FORMATTER = new Intl.DateTimeFormat('en-US', { 
+        weekday: 'long', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+
+    /**
+     * Renders matches for the currently selected date index.
+     */
+    function renderMatchesForDate() {
+        if (availableDates.length === 0) return;
+
+        // Get the selected ISO date string (e.g., "2025-12-15")
+        const currentIsoDate = availableDates[selectedDateIndex];
+        const matchesForSelectedDate = allMatchesData[currentIsoDate];
+        
+        // Convert the ISO date string to a display date for the button
+        const displayDate = DISPLAY_FORMATTER.format(new Date(currentIsoDate));
+        document.getElementById('current-date-display').textContent = displayDate;
+        
+        const allLeaguesContainer = document.getElementById('all-leagues-container');
+        allLeaguesContainer.innerHTML = ""; // Clear existing cards
+
+        // Check if there are matches for this date
+        if (!matchesForSelectedDate || Object.keys(matchesForSelectedDate).length === 0) {
+            allLeaguesContainer.innerHTML = `<p style="text-align: center; font-size: 1.2em; color: #555;">No matches scheduled for this day.</p>`;
+            return;
+        }
+
+        // The data is Map<League Name, List<Match>> for the selected date
+        for (const leagueName in matchesForSelectedDate) {
+            const matches = matchesForSelectedDate[leagueName];
             
-            // Iterate over the keys (league names) of the grouped Map
-            for (const leagueName in groupedMatches) {
-                const matches = groupedMatches[leagueName];
-                
-                // 🌟 STEP 1: Check if the returned array is null or empty
-                // (Equivalent to the single-league check, but here we skip the card creation)
-                if (!matches || matches.length === 0) {
-                    continue; // Skip this league if there are no matches
-                }
-                
-                // --- Dynamic League Card Creation (since we removed the hardcoded HTML) ---
-                const card = document.createElement("section");
-                card.classList.add("league-card");
-                
-                // Add the League Name heading (we need this to insert the logo before it)
-                card.innerHTML = `<h2>${leagueName}</h2><div class="matches"></div>`;
-                
-                const matchesContainer = card.querySelector('.matches');
-                const h2 = card.querySelector('h2');
-                
-                // Assuming the emblem field is now named 'emblem'
-                const leagueImageUrl = matches[0]?.competition?.emblem; 
-                
-                // 3. Insert the image tag
-                if (leagueImageUrl && h2) {
-                    const img = document.createElement('img');
-                    img.src = leagueImageUrl;
-                    img.alt = `${leagueName} Logo`;
-                    img.classList.add('league-logo'); 
+            // --- 1. Create the League Card HTML Structure ---
+            const card = document.createElement("section");
+            card.classList.add("league-card");
+            
+            // Get data needed for the header
+            const leagueImageUrl = matches[0]?.competition?.emblem; 
+            
+            card.innerHTML = `<h2>${leagueName}</h2><div class="matches"></div>`;
+            const matchesContainer = card.querySelector('.matches');
+            const h2 = card.querySelector('h2');
 
-                    // Insert the image before the <h2> element
-                    card.insertBefore(img, h2);
-                }
-                
-                // --- Match Rendering (using the EXACT provided HTML structure) ---
-
-                // Data is present, proceed with rendering
-                matchesContainer.innerHTML = "";
-                
-                matches.forEach(match => {
-                    const homeCrest = match.homeTeam.crest;
-                    const homeName = match.homeTeam.name;
-                    const awayCrest = match.awayTeam.crest;
-                    const awayName = match.awayTeam.name;
-
-                    // 🌟 NEW: Extract Score and Duration Details
-                    const fullTimeHomeScore = match.score.fullTime ? match.score.fullTime.home : '-';
-                    const fullTimeAwayScore = match.score.fullTime ? match.score.fullTime.away : '-';
-                    const duration = match.score.duration || 'N/A';
-                    
-                    // Create a readable score display
-                    const scoreDisplay = `${fullTimeHomeScore} - ${fullTimeAwayScore}`;
-                    
-                    const div = document.createElement("div");
-                    div.innerHTML = `
-                        <div class="match-card">
-                            <div class="teams">
-                                <span class="team home">${match.homeTeam.name}</span>
-                                <img src="${homeCrest}" alt="${homeName} Crest" class="team-crest">
-                                <span class="vs">
-                                    <span class="score">${scoreDisplay}</span> </span>
-                                <img src="${awayCrest}" alt="${awayName} Crest" class="team-crest">
-                                <span class="team away">${match.awayTeam.name}</span>
-                            </div>
-                            <div class="match-date">
-                                <span>${new Date(match.utcDate).toLocaleString()}</span>
-                                <span class="duration"> | ${duration}</span> </div>
-                        </div>
-                    `;
-                    matchesContainer.appendChild(div);
-                });
-
-                allLeaguesContainer.appendChild(card);
+            // Insert the league logo
+            if (leagueImageUrl && h2) {
+                const img = document.createElement('img');
+                img.src = leagueImageUrl;
+                img.alt = `${leagueName} Logo`;
+                img.classList.add('league-logo'); 
+                card.insertBefore(img, h2);
             }
-        })
-        .catch(err => {
-            console.error("Error loading all grouped matches:", err);
-            const container = document.getElementById('all-leagues-container');
-            container.innerHTML = `<p style="color: red;">Failed to load match data. Please ensure the backend server is running on port 7000.</p>`;
-        });
-}
-                loadAllGroupedMatches();
+            
+            // --- 2. Populate the Matches ---
+            matches.forEach(match => {
+                const homeCrest = match.homeTeam.crest;
+                const homeName = match.homeTeam.name;
+                const awayCrest = match.awayTeam.crest;
+                const awayName = match.awayTeam.name;
+
+                // Score Logic
+                const matchStatus = match.status; 
+                let scoreDisplay = 'vs';
+                let timeDisplay = new Date(match.utcDate).toLocaleString();
+
+                if (matchStatus === 'FINISHED') {
+                    const fullTimeHomeScore = match.score.fullTime ? match.score.fullTime.home : '0';
+                    const fullTimeAwayScore = match.score.fullTime ? match.score.fullTime.away : '0';
+                    scoreDisplay = `${fullTimeHomeScore} - ${fullTimeAwayScore}`;
+                    timeDisplay += ` | ${match.score.duration || 'FT'}`;
+                } else if (matchStatus === 'SCHEDULED' || matchStatus === 'TIMED') {
+                    scoreDisplay = 'vs'; // Default for upcoming matches
+                } else if (matchStatus === 'LIVE' || matchStatus === 'IN_PLAY') {
+                    scoreDisplay = `LIVE`;
+                } else {
+                    scoreDisplay = matchStatus; 
+                }
+                
+                const div = document.createElement("div");
+                div.innerHTML = `
+                    <div class="match-card">
+                        <div class="teams">
+                            <span class="team home">${match.homeTeam.name}</span>
+                            <img src="${homeCrest}" alt="${homeName} Crest" class="team-crest">
+                            <span class="vs">
+                                <span class="score">${scoreDisplay}</span>
+                            </span>
+                            <img src="${awayCrest}" alt="${awayName} Crest" class="team-crest">
+                            <span class="team away">${match.awayTeam.name}</span>
+                        </div>
+                        <div class="match-date">
+                            ${timeDisplay}
+                        </div>
+                    </div>
+                `;
+                matchesContainer.appendChild(div);
+            });
+
+            allLeaguesContainer.appendChild(card);
+        }
+    }
+
+    /**
+     * Changes the selected date by the given offset (+1 for next day, -1 for previous).
+     */
+    function changeDate(offset) {
+        // Calculate the new index
+        let newIndex = selectedDateIndex + offset;
+
+        // Boundary checks
+        if (newIndex >= 0 && newIndex < availableDates.length) {
+            selectedDateIndex = newIndex;
+            renderMatchesForDate();
+        }
+    }
+
+
+    /**
+     * Main function to fetch all data once.
+     */
+    function loadAllGroupedMatches() {
+        fetch('http://localhost:7000/football/currentMatches')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(groupedMatches => {
+                // Store the full dataset globally
+                allMatchesData = groupedMatches;
+                
+                // Get and sort all available dates from the keys
+                availableDates = Object.keys(groupedMatches).sort();
+                
+                if (availableDates.length > 0) {
+                    // Find the index for today's date to start the view there
+                    const todayIso = DATE_FORMATTER.format(new Date());
+                    selectedDateIndex = availableDates.findIndex(d => d === todayIso);
+                    
+                    // If today's date isn't in the data, default to the first available date
+                    if (selectedDateIndex === -1) {
+                         selectedDateIndex = 0;
+                    }
+                    
+                    // Render the matches for the initial date
+                    renderMatchesForDate();
+                } else {
+                    document.getElementById('current-date-display').textContent = 'No Data';
+                    document.getElementById('all-leagues-container').innerHTML = `<p style="text-align: center;">No match data was received from the server for the current period.</p>`;
+                }
+            })
+            .catch(err => {
+                console.error("Error loading all grouped matches:", err);
+                document.getElementById('current-date-display').textContent = 'Error';
+                document.getElementById('all-leagues-container').innerHTML = `<p style="color: red; text-align: center;">Failed to load match data. Check server connection (port 7000).</p>`;
+            });
+    }
+    
+    // Load immediately when the page opens
+    loadAllGroupedMatches();
             </script>
 </body>
 </html>
