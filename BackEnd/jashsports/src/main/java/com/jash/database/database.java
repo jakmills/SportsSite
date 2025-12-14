@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class database {
 
-    //private static Dotenv dotenv = Dotenv.load();
+    // private static Dotenv dotenv = Dotenv.load();
 
     // Gets DB credentials from .env file
     // private static String DB_URL = dotenv.get("DB_URL");
@@ -23,7 +25,13 @@ public class database {
         DB_PASSWORD = System.getenv("DB_PASSWORD");
 
         if (DB_URL == null || DB_USERNAME == null || DB_PASSWORD == null) {
-            throw new IllegalStateException("Database environment variables are not set");
+            Dotenv dotnev = Dotenv.load();
+            DB_URL = dotnev.get("DB_URL");
+            DB_USERNAME = dotnev.get("DB_USERNAME");
+            DB_PASSWORD = dotnev.get("DB_PASSWORD");
+            if (DB_URL == null || DB_USERNAME == null || DB_PASSWORD == null) {
+                throw new IllegalStateException("Database environment variables are not set");
+            }
         }
     }
 
@@ -31,5 +39,5 @@ public class database {
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
     }
-    
+
 }
