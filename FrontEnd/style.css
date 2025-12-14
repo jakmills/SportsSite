@@ -484,3 +484,46 @@ body {
     align-items: center;
     font-weight: bold;
 }
+
+/* Styles for searchedTeams.html */
+h1 {
+    text-align: center;
+    margin-top: 50px;
+    color: #333;
+}
+
+#resultsList {
+    list-style-type: none;
+    padding: 0;
+    width: 80%;
+    margin: 20px auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#resultsList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+#resultsList li:last-child {
+    border-bottom: none;
+}
+
+.favButton {
+    padding: 8px 16px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.favButton:hover {
+    background-color: #f0f0f0;
+}
