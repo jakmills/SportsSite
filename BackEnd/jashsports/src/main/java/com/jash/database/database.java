@@ -6,12 +6,12 @@ import java.sql.SQLException;
 
 public class database {
 
-    //private static Dotenv dotenv = Dotenv.load();
+    // private static Dotenv dotenv = Dotenv.load();
 
     // Gets DB credentials from .env file
-    // private static String DB_URL = dotenv.get("DB_URL");
-    // private static String DB_USERNAME = dotenv.get("DB_USERNAME");
-    // private static String DB_PASSWORD = dotenv.get("DB_PASSWORD");
+    //  private static String DB_URL = dotenv.get("DB_URL");
+    //  private static String DB_USERNAME = dotenv.get("DB_USERNAME");
+    //  private static String DB_PASSWORD = dotenv.get("DB_PASSWORD");
 
     private String DB_URL;
     private String DB_USERNAME;

@@ -59,31 +59,38 @@
     </div>
     
     <script>
-        // This sends the info to the backend, now i need to figure out how to get the info to the front end and display it
-        document.getElementById("searchBtn").addEventListener("click", () => {
-        const query = encodeURIComponent(document.getElementById("searchBox").value);
-        const user = auth.currentUser;
+        function performSearch() {
+            const query = encodeURIComponent(document.getElementById("searchBox").value);
+            const user = auth.currentUser;
 
-        // Checks to see if a user is logged in, if not, alerts them to log in
-        if (user === null) {
-            alert('Please log in to search for teams.');
-            return;
+            // Checks to see if a user is logged in, if not, alerts them to log in
+            if (user === null) {
+                alert('Please log in to search for teams.');
+                return;
+            }
+
+            fetch(`http://localhost:7000/searchedTeams/${query}/${user.uid}`) // sends searched result and user unique ID to frontend
+                .then(response => response.json())
+                .then(data => {
+                    if(data.length > 0) {
+                        sessionStorage.setItem('searchedTeams', JSON.stringify(data));
+                        window.location.href = 'searchedTeams.html';
+                    } else {
+                        alert('No teams were found. We only have data for top leagues.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('An error occurred');
+                });
         }
 
-        fetch(`http://localhost:7000/searchedTeams/${query}/${user.uid}`) // sends searched result and user unique ID to frontend
-            .then(response => response.json())
-            .then(data => {
-                if(data.length > 0) {
-                    sessionStorage.setItem('searchedTeams', JSON.stringify(data));
-                    window.location.href = 'searchedTeams.html';
-                } else {
-                    alert('No teams were found. We only have data for top leagues.');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('An error occurred');
-            });
+        document.getElementById("searchBtn").addEventListener("click", performSearch);
+
+        document.getElementById("searchBox").addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                performSearch();
+            }
         });
     </script>
 
