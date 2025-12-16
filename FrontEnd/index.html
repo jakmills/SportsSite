@@ -242,7 +242,14 @@
         }
     }
 
-
+const getUTCIsoDateString = (dateObj) => {
+        // Use getUTCFullYear, getUTCMonth, getUTCDate to ignore local timezone
+        const year = dateObj.getUTCFullYear();
+        // getUTCMonth() is 0-indexed, so add 1
+        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); 
+        const day = String(dateObj.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
     /**
      * Main function to fetch all data once.
      */
@@ -258,20 +265,42 @@
                 // Store the full dataset globally
                 allMatchesData = groupedMatches;
                 
-                // Get and sort all available dates from the keys
                 availableDates = Object.keys(groupedMatches).sort();
                 
                 if (availableDates.length > 0) {
-                    // Find the index for today's date to start the view there
-                    const todayIso = DATE_FORMATTER.format(new Date());
-                    selectedDateIndex = availableDates.findIndex(d => d === todayIso);
                     
-                    // If today's date isn't in the data, default to the first available date
+                    // 1. Calculate today's date based on UTC time
+                    const todayUtcIso = getUTCIsoDateString(new Date()); 
+                    
+                    // 2. Try to find today's date key
+                    selectedDateIndex = availableDates.findIndex(d => d === todayUtcIso);
+                    
+                    // 3. Handle Mismatch (The fix for the offset)
                     if (selectedDateIndex === -1) {
-                         selectedDateIndex = 0;
+                         // The key for "Today" was not found (due to timezone differences).
+                         // We will check the first available date, as that is the earliest day
+                         // the API is providing matches for (the minusDays(2) start).
+                         
+                         // Check the first available key. If it's earlier than today, we need to 
+                         // shift the view forward to the first available date that is >= today.
+                         
+                         let bestStartIndex = 0;
+                         const currentDate = new Date();
+                         const todayDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+
+                         for(let i = 0; i < availableDates.length; i++){
+                             // Create a simple Date object from the ISO string key (2025-12-11)
+                             const keyDate = new Date(availableDates[i]);
+                             
+                             // If the key date is Today or in the future, that's our starting point.
+                             if (keyDate >= todayDateOnly) {
+                                 bestStartIndex = i;
+                                 break;
+                             }
+                         }
+                         selectedDateIndex = bestStartIndex;
+                        
                     }
-                    
-                    // Render the matches for the initial date
                     renderMatchesForDate();
                 } else {
                     document.getElementById('current-date-display').textContent = 'No Data';
