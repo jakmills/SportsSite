@@ -36,7 +36,7 @@ public class footballDATA {
             LocalDate today = LocalDate.now();
             Request request = new Request.Builder()
                     .url("https://api.football-data.org/v4/matches?dateFrom="
-                            + today.toString() + "&dateTo=" + today.plusDays(7).toString())
+                            + today.minusDays(2).toString() + "&dateTo=" + today.plusDays(7).toString())
                     .addHeader("X-Auth-Token", apiKey)
                     .build();
             Response response = client.newCall(request).execute();
@@ -46,28 +46,14 @@ public class footballDATA {
             String json = response.body().string();
             Gson gson = new Gson(); // Parse the top-level object
             MatchesResponse data = gson.fromJson(json, MatchesResponse.class);
-            return data.matches; // This is your ArrayList<Match>
+            return data.matches;
         } catch (Exception e) {
             return null;
         }
     }
 
-    public Map<String, List<Match>> getAllMatchesGroupedByLeague() {
-        List<Match> allMatches = null;
-        try {
-            allMatches = getAllMatches();
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-        Map<String, List<Match>> groupedMatches = allMatches.stream()
-                .collect(Collectors.groupingBy(
-                        match -> match.competition.name));
-
-        return groupedMatches;
-    }
-
     public Map<String, Map<String, List<Match>>> getAllMatchesGroupedByDate() {
-        // 1. Get the raw list of all matches from the API
+        // get list of matches from api
         List<Match> allMatches = null;
         try {
             allMatches = getAllMatches();
@@ -75,47 +61,19 @@ public class footballDATA {
             System.out.println(e.toString());
         }
 
-        // 2. Perform the two-level grouping using nested collectors
+        // nested grouping
         Map<String, Map<String, List<Match>>> groupedByDate = allMatches.stream()
                 .collect(Collectors.groupingBy(
-                        // 🌟 OUTER GROUPING (KEY: Date String) 🌟
+                        // outer grouping, groups by date
                         match -> {
-                            // Parse the ISO date string and format it to just the date part (e.g.,
-                            // "YYYY-MM-DD")
+                            // parse the iso date string and format it to just the date part
                             ZonedDateTime dateTime = ZonedDateTime.parse(match.utcDate);
                             return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
                         },
-                        // 🌟 INNER GROUPING (VALUE: Map<League Name, List<Match>>) 🌟
+                        // inner grouping, groups by competition
                         Collectors.groupingBy(
-                                // Inner Classifier Function (KEY: League Name)
                                 match -> match.competition.name)));
 
         return groupedByDate;
     }
-
-    // public Map<String, Map<String, List<Match>>> getAllMatchesGroupedByDate() {
-    // List<Match> matches = null;
-    // try {
-    // matches = getAllMatches();
-    // } catch (Exception e) {
-    // System.out.println(e.toString());
-    // }
-    // Map<String, Map<String, List<Match>>> groupedByDate = matches.stream()
-    // .collect(Collectors.groupingBy(
-    // // 🌟 OUTER GROUPING (KEY: Date String) 🌟
-    // match -> {
-    // // Parse the ISO date string and format it to just the date part (e.g.,
-    // "YYYY-MM-DD")
-    // ZonedDateTime dateTime = ZonedDateTime.parse(match.getUtcDate());
-    // return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
-    // },
-
-    // // 🌟 INNER GROUPING (VALUE: Map<League Name, List<Match>>) 🌟
-    // Collectors.groupingBy(
-    // // Inner Classifier Function (KEY: League Name)
-    // match -> match.Competition.Name
-    // )
-    // ));
-    // return groupedByDate;
-    // }
 }
