@@ -563,6 +563,8 @@ body {
 
 .date-nav-button:hover {
     background-color: #666666; /* Slightly lighter on hover */
+}
+
 /* Styles for searchedTeams.html */
 h1 {
     text-align: center;
