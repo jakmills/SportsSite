@@ -19,15 +19,16 @@ public class firebase {
 
         // Tested this and it works
         if (FirebaseApp.getApps().isEmpty()) {
-            // Dotenv dotnev = Dotenv.load();
-
-            // InputStream serviceAccount = new FileInputStream(dotnev.get("GOOGLE_APPLICATION_CREDENTIALS"));
-
-            InputStream serviceAccount = new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
-
+            InputStream serviceAccount = null;
+            if (System.getenv("GOOGLE_APPLICATION_CREDENTIALS") == null) {
+                Dotenv dotnev = Dotenv.load();
+                serviceAccount = new FileInputStream(dotnev.get("GOOGLE_APPLICATION_CREDENTIALS"));
+            } else {
+                serviceAccount = new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+            }
             FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .build();
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
 
             FirebaseApp.initializeApp(options);
         }
@@ -35,10 +36,10 @@ public class firebase {
 
     // tested it and it works
     public String getUidByEmail(String email) throws FirebaseAuthException {
-        if (email == null || email.isEmpty()) return null;
+        if (email == null || email.isEmpty())
+            return null;
         UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
         return user.getUid();
     }
-
 
 }

@@ -1,7 +1,5 @@
 package com.jash;
 
-import java.util.ArrayList;
-
 import com.jash.favoriteTeams.favTeam;
 import com.jash.footballDATA.Match;
 import com.jash.footballDATA.footballDATA;
@@ -28,7 +26,7 @@ public class Main {
 
         app.get("/football/currentMatches", ctx -> {
             try {
-                Map<String, List<Match>> groupedMatches = fd.getAllMatchesGroupedByLeague();
+                Map<String, Map<String, List<Match>>> groupedMatches = fd.getAllMatchesGroupedByDate();
                 ctx.json(groupedMatches);
             } catch (Exception e) {
                 ctx.status(500).result("Error fetching matches: " + e.getMessage());
@@ -101,7 +99,6 @@ public class Main {
                 ctx.status(500).result("Error: " + e.getMessage());
             }
         });
-
 
         app.get("favorite/{teamName}/{userID}", ctx -> {
             String teamName = ctx.pathParam("teamName").replace("-", " ");
