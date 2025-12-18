@@ -150,7 +150,16 @@
         const matchesForSelectedDate = allMatchesData[currentIsoDate];
         
         // Convert the ISO date string to a display date for the button
-        const displayDate = DISPLAY_FORMATTER.format(new Date(currentIsoDate));
+
+        const displayDateObj = new Date(currentIsoDate);
+
+        // Add one day to align displayed date with match data (e.g., when API uses UTC grouping)
+
+        displayDateObj.setDate(displayDateObj.getDate() + 1);
+
+        const displayDate = DISPLAY_FORMATTER.format(displayDateObj);
+        // Convert the ISO date string to a display date for the button
+        //const displayDate = DISPLAY_FORMATTER.format(new Date(currentIsoDate));
         document.getElementById('current-date-display').textContent = displayDate;
         
         const allLeaguesContainer = document.getElementById('all-leagues-container');
@@ -202,11 +211,13 @@
                     const fullTimeHomeScore = match.score.fullTime ? match.score.fullTime.home : '0';
                     const fullTimeAwayScore = match.score.fullTime ? match.score.fullTime.away : '0';
                     scoreDisplay = `${fullTimeHomeScore} - ${fullTimeAwayScore}`;
-                    timeDisplay += ` | ${match.score.duration || 'FT'}`;
+                    timeDisplay += ` | FT`;
                 } else if (matchStatus === 'SCHEDULED' || matchStatus === 'TIMED') {
                     scoreDisplay = 'vs'; // Default for upcoming matches
                 } else if (matchStatus === 'LIVE' || matchStatus === 'IN_PLAY') {
                     scoreDisplay = `LIVE`;
+
+                    // add live scroes here
                 } else {
                     scoreDisplay = matchStatus; 
                 }
