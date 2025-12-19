@@ -607,3 +607,21 @@ h1 {
 .favButton:hover {
     background-color: #f0f0f0;
 }
+
+.status-message {
+    text-align: center;
+    font-size: 1.4em;
+    color: #aaaaaa;
+    margin-top: 50px;
+    font-style: italic;
+}
+
+#loading-indicator {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}

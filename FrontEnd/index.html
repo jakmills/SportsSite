@@ -116,7 +116,7 @@
     <!-- Make the section for league games -->
     <!-- Section for day of the week and ability to switch days to see different games -->
     <div class="leagues-container" id="all-leagues-container">
-    
+        <div id="loading-indicator" class="status-message">Loading matches...</div>
     </div>
             <script>
                 // Global variables to store the fetched data and control navigation
@@ -163,14 +163,14 @@
         document.getElementById('current-date-display').textContent = displayDate;
         
         const allLeaguesContainer = document.getElementById('all-leagues-container');
-        allLeaguesContainer.innerHTML = ""; // Clear existing cards
+        allLeaguesContainer.innerHTML = '<div id="loading-indicator" class="status-message">Loading matches...</div>'; // start loading message
 
         // Check if there are matches for this date
         if (!matchesForSelectedDate || Object.keys(matchesForSelectedDate).length === 0) {
             allLeaguesContainer.innerHTML = `<p style="text-align: center; font-size: 1.2em; color: #555;">No matches scheduled for this day.</p>`;
             return;
         }
-
+        allLeaguesContainer.innerHTML = ''; //clear the loading message
         // The data is Map<League Name, List<Match>> for the selected date
         for (const leagueName in matchesForSelectedDate) {
             const matches = matchesForSelectedDate[leagueName];
@@ -241,7 +241,6 @@
                 `;
                 matchesContainer.appendChild(div);
             });
-
             allLeaguesContainer.appendChild(card);
         }
     }
