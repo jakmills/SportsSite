@@ -152,7 +152,10 @@
         // Convert the ISO date string to a display date for the button
 
         const displayDateObj = new Date(currentIsoDate);
+        const todayIso = getLocalIsoDateString(new Date());
 
+        // 3. Determine the display text
+        let displayText;
         // Add one day to align displayed date with match data (e.g., when API uses UTC grouping)
 
         displayDateObj.setDate(displayDateObj.getDate() + 1);
@@ -160,17 +163,38 @@
         const displayDate = DISPLAY_FORMATTER.format(displayDateObj);
         // Convert the ISO date string to a display date for the button
         //const displayDate = DISPLAY_FORMATTER.format(new Date(currentIsoDate));
-        document.getElementById('current-date-display').textContent = displayDate;
+        
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayIso = getLocalIsoDateString(yesterday);
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowIso = getLocalIsoDateString(tomorrow);
+
+        if (currentIsoDate === todayIso) {
+            displayText = "Today";
+        } else if (currentIsoDate === yesterdayIso) {
+            displayText = "Yesterday";
+        } else if (currentIsoDate === tomorrowIso) {
+            displayText = "Tomorrow";
+        } else {
+            // Fallback to the standard formatted date
+            const displayDateObj = new Date(currentIsoDate);
+            displayDateObj.setDate(displayDateObj.getDate() + 1);
+            displayText = DISPLAY_FORMATTER.format(displayDateObj);
+        }
+        document.getElementById('current-date-display').textContent = displayText;
         
         const allLeaguesContainer = document.getElementById('all-leagues-container');
-        allLeaguesContainer.innerHTML = '<div id="loading-indicator" class="status-message">Loading matches...</div>'; // start loading message
+        allLeaguesContainer.innerHTML = ""; // Clear existing cards
 
         // Check if there are matches for this date
         if (!matchesForSelectedDate || Object.keys(matchesForSelectedDate).length === 0) {
             allLeaguesContainer.innerHTML = `<p style="text-align: center; font-size: 1.2em; color: #555;">No matches scheduled for this day.</p>`;
             return;
         }
-        allLeaguesContainer.innerHTML = ''; //clear the loading message
+
         // The data is Map<League Name, List<Match>> for the selected date
         for (const leagueName in matchesForSelectedDate) {
             const matches = matchesForSelectedDate[leagueName];
@@ -241,6 +265,7 @@
                 `;
                 matchesContainer.appendChild(div);
             });
+
             allLeaguesContainer.appendChild(card);
         }
     }
@@ -259,14 +284,13 @@
         }
     }
 
-const getUTCIsoDateString = (dateObj) => {
-        // Use getUTCFullYear, getUTCMonth, getUTCDate to ignore local timezone
-        const year = dateObj.getUTCFullYear();
-        // getUTCMonth() is 0-indexed, so add 1
-        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); 
-        const day = String(dateObj.getUTCDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+// Add this at the very top of your <script> tag
+const getLocalIsoDateString = (dateObj) => {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); 
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
     /**
      * Main function to fetch all data once.
      */
@@ -279,50 +303,37 @@ const getUTCIsoDateString = (dateObj) => {
                 return response.json();
             })
             .then(groupedMatches => {
-                // Store the full dataset globally
-                allMatchesData = groupedMatches;
-                
-                availableDates = Object.keys(groupedMatches).sort();
-                
-                if (availableDates.length > 0) {
-                    
-                    // 1. Calculate today's date based on UTC time
-                    const todayUtcIso = getUTCIsoDateString(new Date()); 
-                    
-                    // 2. Try to find today's date key
-                    selectedDateIndex = availableDates.findIndex(d => d === todayUtcIso);
-                    
-                    // 3. Handle Mismatch (The fix for the offset)
-                    if (selectedDateIndex === -1) {
-                         // The key for "Today" was not found (due to timezone differences).
-                         // We will check the first available date, as that is the earliest day
-                         // the API is providing matches for (the minusDays(2) start).
-                         
-                         // Check the first available key. If it's earlier than today, we need to 
-                         // shift the view forward to the first available date that is >= today.
-                         
-                         let bestStartIndex = 0;
-                         const currentDate = new Date();
-                         const todayDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+             allMatchesData = groupedMatches;
+            
+            // --- NEW: Generate a full range of dates (-2 to +7) ---
+            availableDates = [];
+            const start = new Date();
+            start.setDate(start.getDate() - 2); // Start 2 days ago
 
-                         for(let i = 0; i < availableDates.length; i++){
-                             // Create a simple Date object from the ISO string key (2025-12-11)
-                             const keyDate = new Date(availableDates[i]);
-                             
-                             // If the key date is Today or in the future, that's our starting point.
-                             if (keyDate >= todayDateOnly) {
-                                 bestStartIndex = i;
-                                 break;
-                             }
-                         }
-                         selectedDateIndex = bestStartIndex;
-                        
-                    }
-                    renderMatchesForDate();
-                } else {
-                    document.getElementById('current-date-display').textContent = 'No Data';
-                    document.getElementById('all-leagues-container').innerHTML = `<p style="text-align: center;">No match data was received from the server for the current period.</p>`;
-                }
+            for (let i = 0; i < 10; i++) { // 2 days ago + today + 7 days ahead = 10 days total
+                const d = new Date(start);
+                d.setDate(start.getDate() + i);
+                
+                // Format as YYYY-MM-DD (local time) to match your Map keys
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateString = `${year}-${month}-${day}`;
+                
+                availableDates.push(dateString);
+            }
+            // -----------------------------------------------------
+
+            if (availableDates.length > 0) {
+                // Find index for Today
+                const todayIso = getLocalIsoDateString(new Date());
+                selectedDateIndex = availableDates.indexOf(todayIso);
+                
+                // If today isn't found for some reason, default to middle (index 2)
+                if (selectedDateIndex === -1) selectedDateIndex = 2;
+
+                renderMatchesForDate();
+            }
             })
             .catch(err => {
                 console.error("Error loading all grouped matches:", err);
